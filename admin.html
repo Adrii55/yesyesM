@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Si Mamá!!! Bolivia</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap" rel="stylesheet">
+<style>
+:root{
+  --rose:#f9a8c9;--rose-d:#f472a8;--rose-l:#fde8f2;
+  --mint:#a8e6cf;--mint-d:#5bbd8e;--mint-l:#e8f8f2;
+  --sky:#b8dff5;--sky-l:#e8f4fd;
+  --cream:#fff8f0;--beige:#f5ede0;
+  --text:#4a3f4a;--text-l:#9b8da0;
+  --shadow:0 4px 24px rgba(180,120,160,.13);
+  --shadow-h:0 8px 32px rgba(180,120,160,.22);
+  --radius:16px;--radius-l:24px;
+  --danger:#ff6b6b;--success:#6bcb77;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Nunito',sans-serif;background:#f0e8f0;color:var(--text);min-height:100vh;}
+
+/* LOGIN */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(135deg,#fde8f2,#e8f4fd,#e8f8f2);}
+.login-box{background:white;border-radius:var(--radius-l);padding:36px;width:100%;max-width:360px;box-shadow:var(--shadow-h);text-align:center;}
+.login-logo{font-family:'Pacifico',cursive;font-size:1.9rem;color:var(--rose-d);margin:6px 0 4px;}
+.login-sub{font-size:.82rem;color:var(--text-l);font-weight:700;margin-bottom:24px;}
+.fg{margin-bottom:14px;text-align:left;}
+.fg label{display:block;font-weight:800;font-size:.8rem;margin-bottom:5px;}
+.fg input{width:100%;padding:11px 14px;border-radius:12px;border:2px solid var(--beige);background:var(--cream);font-family:'Nunito',sans-serif;font-size:.92rem;outline:none;transition:border-color .2s;}
+.fg input:focus{border-color:var(--rose);}
+.btn-login{width:100%;padding:12px;border-radius:50px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--rose-d),#e05f9a);color:white;font-family:'Nunito',sans-serif;font-weight:900;font-size:.98rem;box-shadow:0 4px 16px rgba(244,114,168,.35);margin-top:6px;transition:all .2s;}
+.btn-login:hover{transform:translateY(-1px);}
+.login-err{color:var(--danger);font-weight:700;font-size:.83rem;margin-top:8px;display:none;}
+
+/* SHELL */
+#adminShell{display:none;min-height:100vh;}
+
+/* SIDEBAR */
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:216px;background:linear-gradient(180deg,#4a3f4a,#6b5470);padding:0;z-index:50;overflow-y:auto;display:flex;flex-direction:column;}
+.sb-logo{padding:20px;border-bottom:1px solid rgba(255,255,255,.1);}
+.sb-logo .ln{font-family:'Pacifico',cursive;color:var(--rose);font-size:1.1rem;}
+.sb-logo .ls{color:rgba(255,255,255,.4);font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+.sb-nav{padding:12px 0;flex:1;}
+.sb-item{display:flex;align-items:center;gap:9px;padding:10px 18px;color:rgba(255,255,255,.62);font-weight:700;font-size:.85rem;cursor:pointer;transition:all .18s;border:none;background:none;width:100%;text-align:left;}
+.sb-item:hover,.sb-item.active{background:rgba(249,168,201,.15);color:white;border-right:3px solid var(--rose);}
+.sb-icon{font-size:1.1rem;}
+.sb-badge{background:var(--rose-d);color:white;border-radius:50px;padding:1px 7px;font-size:.68rem;margin-left:auto;display:none;}
+.sb-footer{padding:14px 18px;border-top:1px solid rgba(255,255,255,.1);}
+.sb-logout{display:flex;align-items:center;gap:7px;color:rgba(255,255,255,.42);font-size:.8rem;font-weight:700;cursor:pointer;background:none;border:none;width:100%;padding:6px 0;transition:color .2s;}
+.sb-logout:hover{color:var(--danger);}
+
+/* MAIN */
+.main{margin-left:216px;padding:26px;min-height:100vh;}
+@media(max-width:680px){
+  .sidebar{transform:translateX(-100%);transition:transform .3s;}
+  .sidebar.mob-open{transform:translateX(0);}
+  .main{margin-left:0;padding:14px;}
+  .mob-bar{display:flex!important;}
+}
+.mob-bar{display:none;align-items:center;gap:10px;padding:13px 16px;background:linear-gradient(135deg,#4a3f4a,#6b5470);position:sticky;top:0;z-index:40;}
+.mob-bar button{background:none;border:none;color:white;font-size:1.35rem;cursor:pointer;}
+.mob-bar span{font-family:'Pacifico',cursive;color:var(--rose);font-size:1.05rem;}
+
+/* PANELS */
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:14px;margin-bottom:24px;}
+.stat-card{background:white;border-radius:var(--radius);padding:18px 14px;text-align:center;box-shadow:var(--shadow);}
+.stat-icon{font-size:1.8rem;margin-bottom:6px;}
+.stat-val{font-size:1.7rem;font-weight:900;color:var(--text);}
+.stat-lab{font-size:.72rem;font-weight:700;color:var(--text-l);text-transform:uppercase;letter-spacing:.4px;margin-top:2px;}
+
+/* BUTTONS */
+.btn{padding:9px 18px;border-radius:50px;border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;font-size:.85rem;transition:all .2s;display:inline-flex;align-items:center;gap:5px;}
+.btn-primary{background:linear-gradient(135deg,var(--rose-d),#e05f9a);color:white;box-shadow:0 3px 12px rgba(244,114,168,.35);}
+.btn-primary:hover{transform:translateY(-1px);}
+.btn-success{background:linear-gradient(135deg,var(--mint-d),#3a9e6e);color:white;}
+.btn-danger{background:var(--danger);color:white;}
+.btn-ghost{background:var(--beige);color:var(--text);}
+.btn-ghost:hover{background:var(--rose-l);color:var(--rose-d);}
+.btn-sm{padding:6px 13px;font-size:.76rem;}
+.btn-info{background:var(--sky-l);color:#0c6698;}
+
+/* SEC HEAD */
+.sec-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px;}
+.sec-head h2{font-size:1.25rem;font-weight:900;color:var(--text);}
+
+/* SEARCH */
+.search-bar{position:relative;max-width:300px;}
+.search-bar input{width:100%;padding:9px 14px 9px 38px;border-radius:50px;border:2px solid var(--beige);background:white;font-family:'Nunito',sans-serif;font-size:.85rem;outline:none;transition:border-color .2s;}
+.search-bar input:focus{border-color:var(--rose);}
+.search-bar .si{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-l);}
+
+/* TABLE */
+.table-wrap{background:white;border-radius:var(--radius-l);box-shadow:var(--shadow);overflow:hidden;}
+.table-scroll{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead{background:linear-gradient(135deg,var(--rose-l),var(--sky-l));}
+th{padding:12px 14px;text-align:left;font-size:.76rem;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--text);white-space:nowrap;}
+td{padding:12px 14px;font-size:.85rem;font-weight:600;border-bottom:1px solid var(--beige);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--cream);}
+.status-badge{padding:3px 11px;border-radius:50px;font-size:.7rem;font-weight:800;text-transform:uppercase;white-space:nowrap;}
+.s-pending{background:#fff3cd;color:#856404;}
+.s-sent{background:var(--sky-l);color:#0c6698;}
+.s-delivered{background:var(--mint-l);color:#1a6b44;}
+.avail-yes{background:var(--mint-l);color:var(--mint-d);padding:3px 10px;border-radius:50px;font-size:.7rem;font-weight:800;}
+.avail-no{background:#ffe8e8;color:var(--danger);padding:3px 10px;border-radius:50px;font-size:.7rem;font-weight:800;}
+.td-actions{display:flex;gap:5px;flex-wrap:wrap;}
+.empty-row td{text-align:center;padding:36px;color:var(--text-l);font-weight:700;}
+.order-sel{padding:5px 10px;border-radius:50px;border:2px solid var(--beige);font-family:'Nunito',sans-serif;font-weight:700;font-size:.75rem;cursor:pointer;outline:none;background:white;}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(74,63,74,.5);backdrop-filter:blur(4px);z-index:200;align-items:center;justify-content:center;padding:16px;}
+.modal-overlay.open{display:flex;}
+.modal{background:white;border-radius:var(--radius-l);padding:26px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 16px 60px rgba(74,63,74,.25);animation:slideUp .3s ease;}
+@keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.modal-hd h3{font-size:1.05rem;font-weight:900;}
+.modal-close{background:var(--rose-l);border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:.95rem;color:var(--rose-d);}
+.fg2{margin-bottom:13px;}
+.fg2 label{display:block;font-weight:800;font-size:.8rem;margin-bottom:5px;color:var(--text);}
+.fg2 input,.fg2 select,.fg2 textarea{width:100%;padding:10px 13px;border-radius:12px;border:2px solid var(--beige);background:var(--cream);font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:600;color:var(--text);outline:none;transition:border-color .2s;}
+.fg2 input:focus,.fg2 select:focus,.fg2 textarea:focus{border-color:var(--rose);}
+.fg2 textarea{min-height:66px;resize:vertical;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+@media(max-width:460px){.form-row{grid-template-columns:1fr;}}
+.modal-ft{display:flex;gap:9px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap;}
+
+/* IMAGE MANAGER */
+.img-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;margin-bottom:10px;}
+.img-thumb{position:relative;border-radius:10px;overflow:hidden;background:var(--beige);aspect-ratio:1;}
+.img-thumb img{width:100%;height:100%;object-fit:cover;}
+.img-thumb .del-btn{position:absolute;top:4px;right:4px;background:rgba(255,0,0,.75);color:white;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:.7rem;display:flex;align-items:center;justify-content:center;}
+.img-add-btn{border:2px dashed var(--rose);border-radius:10px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--rose-d);font-size:.7rem;font-weight:800;gap:3px;transition:background .2s;background:none;}
+.img-add-btn:hover{background:var(--rose-l);}
+.img-add-btn span{font-size:1.4rem;}
+
+/* MEDIA MANAGER */
+.media-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
+.media-row{background:var(--cream);border-radius:12px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.media-row-info{flex:1;font-size:.82rem;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.media-row-info small{display:block;color:var(--text-l);font-size:.72rem;}
+
+/* TAB STRIP */
+.tab-strip{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;}
+.tab-btn{padding:8px 16px;border-radius:50px;border:2px solid var(--beige);font-family:'Nunito',sans-serif;font-weight:700;font-size:.82rem;cursor:pointer;background:white;color:var(--text-l);transition:all .2s;}
+.tab-btn.active{background:var(--rose-d);color:white;border-color:var(--rose-d);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(100px);background:#4a3f4a;color:white;padding:11px 22px;border-radius:50px;font-weight:800;font-size:.85rem;z-index:300;box-shadow:0 4px 20px rgba(0,0,0,.25);transition:transform .4s ease;pointer-events:none;display:flex;align-items:center;gap:6px;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.success{background:var(--mint-d);}
+.toast.error{background:var(--danger);}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <div style="font-size:2.8rem">🍼</div>
+    <div class="login-logo">Si Mamá!!!</div>
+    <div class="login-sub">Panel de Administrador · Bolivia</div>
+    <div class="fg"><label>👤 Usuario</label><input type="text" id="loginUser" placeholder="admin" autocomplete="username"></div>
+    <div class="fg"><label>🔒 Contraseña</label><input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password"></div>
+    <button class="btn-login" onclick="doLogin()">Entrar al panel 🚀</button>
+    <div class="login-err" id="loginErr">❌ Usuario o contraseña incorrectos</div>
+    <p style="margin-top:14px;font-size:.73rem;color:var(--text-l);font-weight:600;">Usuario: <strong>admin</strong> &nbsp;|&nbsp; Contraseña: <strong>mamita2026</strong></p>
+  </div>
+</div>
+
+<!-- SHELL -->
+<div id="adminShell">
+  <div class="mob-bar">
+    <button onclick="toggleSidebar()">☰</button>
+    <span>Si Mamá!!! Admin</span>
+  </div>
+  <nav class="sidebar" id="sidebar">
+    <div class="sb-logo">
+      <div style="font-size:1.7rem">🍼</div>
+      <div class="ln">Si Mamá!!!</div>
+      <div class="ls">Panel Admin · 2026</div>
+    </div>
+    <div class="sb-nav">
+      <button class="sb-item active" id="sb-dashboard" onclick="goPanel('dashboard')"><span class="sb-icon">📊</span>Dashboard</button>
+      <button class="sb-item" id="sb-products"  onclick="goPanel('products')"><span class="sb-icon">📦</span>Productos</button>
+      <button class="sb-item" id="sb-orders"    onclick="goPanel('orders')"><span class="sb-icon">🛍️</span>Pedidos<span class="sb-badge" id="pendingBadge"></span></button>
+      <button class="sb-item" id="sb-media"     onclick="goPanel('media')"><span class="sb-icon">🖼️</span>Fotos & Videos</button>
+    </div>
+    <div class="sb-footer">
+      <a href="index.html" style="color:rgba(255,255,255,.42);font-size:.78rem;font-weight:700;text-decoration:none;display:block;margin-bottom:8px;">🔗 Ver tienda</a>
+      <button class="sb-logout" onclick="doLogout()">🚪 Cerrar sesión</button>
+    </div>
+  </nav>
+
+  <div class="main">
+
+    <!-- DASHBOARD -->
+    <div class="panel active" id="panel-dashboard">
+      <h2 style="font-size:1.4rem;font-weight:900;margin-bottom:18px">¡Bienvenida al panel! 💕</h2>
+      <div class="stats-grid" id="statsGrid"></div>
+      <div class="table-wrap">
+        <div style="padding:14px 18px;font-weight:900;font-size:.98rem;border-bottom:1px solid var(--beige)">🕐 Últimos pedidos</div>
+        <div class="table-scroll"><table><thead><tr><th>Fecha</th><th>Cliente</th><th>Producto</th><th>Total</th><th>Estado</th></tr></thead><tbody id="recentTbody"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div class="panel" id="panel-products">
+      <div class="sec-head">
+        <h2>📦 Productos</h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <div class="search-bar"><span class="si">🔍</span><input type="text" id="prodSearch" placeholder="Buscar..." oninput="renderProductsTable()"></div>
+          <button class="btn btn-primary" onclick="openProductModal()">➕ Agregar</button>
+        </div>
+      </div>
+      <div class="table-wrap"><div class="table-scroll">
+        <table><thead><tr><th></th><th>Nombre</th><th>Categoría</th><th>Precio</th><th>2 uds</th><th>Fotos</th><th>Disponible</th><th>Acciones</th></tr></thead>
+        <tbody id="productsTbody"></tbody></table>
+      </div></div>
+    </div>
+
+    <!-- ORDERS -->
+    <div class="panel" id="panel-orders">
+      <div class="sec-head">
+        <h2>🛍️ Pedidos</h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <div class="search-bar"><span class="si">🔍</span><input type="text" id="orderSearch" placeholder="Buscar..." oninput="renderOrdersTable()"></div>
+          <button class="btn btn-danger btn-sm" onclick="clearOrders()">🗑️ Limpiar</button>
+        </div>
+      </div>
+      <div class="table-wrap"><div class="table-scroll">
+        <table><thead><tr><th>Fecha</th><th>Cliente</th><th>Teléfono</th><th>Producto</th><th>Cant.</th><th>Total</th><th>Dirección</th><th>Estado</th><th>Cambiar</th></tr></thead>
+        <tbody id="ordersTbody"></tbody></table>
+      </div></div>
+    </div>
+
+    <!-- MEDIA -->
+    <div class="panel" id="panel-media">
+      <div class="sec-head"><h2>🖼️ Fotos & Videos</h2></div>
+      <div class="tab-strip">
+        <button class="tab-btn active" onclick="switchMediaTab('ferias-fotos')">📸 Fotos de Ferias</button>
+        <button class="tab-btn" onclick="switchMediaTab('ferias-videos')">🎥 Videos de Ferias</button>
+        <button class="tab-btn" onclick="switchMediaTab('uso-videos')">▶️ Videos de Uso</button>
+      </div>
+
+      <!-- FERIAS FOTOS -->
+      <div class="tab-panel active" id="mt-ferias-fotos">
+        <div class="table-wrap" style="padding:20px">
+          <h3 style="font-weight:900;margin-bottom:14px">📸 Fotos de Ferias</h3>
+          <p style="color:var(--text-l);font-size:.85rem;font-weight:600;margin-bottom:16px">Agrega URLs de imágenes (de Google Drive, Imgur, etc.) que se mostrarán en la sección "Sobre Nosotros".</p>
+          <div class="media-list" id="feriasFotosList"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 80px;gap:10px;align-items:end">
+            <div class="fg2"><label>URL de la imagen</label><input type="url" id="ffUrl" placeholder="https://..."></div>
+            <div class="fg2"><label>Etiqueta (opcional)</label><input type="text" id="ffLabel" placeholder="Feria Expo Mamá 2025"></div>
+            <button class="btn btn-success" onclick="addFeriaFoto()">➕ Agregar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- FERIAS VIDEOS -->
+      <div class="tab-panel" id="mt-ferias-videos">
+        <div class="table-wrap" style="padding:20px">
+          <h3 style="font-weight:900;margin-bottom:14px">🎥 Videos de Ferias</h3>
+          <p style="color:var(--text-l);font-size:.85rem;font-weight:600;margin-bottom:16px">Pega links de YouTube o URLs directas de video.</p>
+          <div class="media-list" id="feriasVideosList"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 80px;gap:10px;align-items:end" class="fv-form">
+            <div class="fg2"><label>URL del video / YouTube</label><input type="url" id="fvUrl" placeholder="https://youtube.com/..."></div>
+            <div class="fg2"><label>Etiqueta</label><input type="text" id="fvLabel" placeholder="Feria 2025"></div>
+            <div class="fg2"><label>Tipo</label>
+              <select id="fvType"><option value="youtube">YouTube</option><option value="directo">Video directo (URL)</option></select>
+            </div>
+            <button class="btn btn-success" onclick="addFeriaVideo()">➕ Agregar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- USO VIDEOS -->
+      <div class="tab-panel" id="mt-uso-videos">
+        <div class="table-wrap" style="padding:20px">
+          <h3 style="font-weight:900;margin-bottom:14px">▶️ Videos de Uso</h3>
+          <p style="color:var(--text-l);font-size:.85rem;font-weight:600;margin-bottom:16px">Videos instructivos que aparecerán en la sección "Cómo Usar".</p>
+          <div class="media-list" id="usoVideosList"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 80px;gap:10px;align-items:end" class="uv-form">
+            <div class="fg2"><label>URL / YouTube</label><input type="url" id="uvUrl" placeholder="https://..."></div>
+            <div class="fg2"><label>Título</label><input type="text" id="uvLabel" placeholder="Cómo usar el S21"></div>
+            <div class="fg2"><label>Descripción</label><input type="text" id="uvDesc" placeholder="Paso a paso..."></div>
+            <div class="fg2"><label>Tipo</label>
+              <select id="uvType"><option value="youtube">YouTube</option><option value="directo">Video directo</option></select>
+            </div>
+            <button class="btn btn-success" onclick="addUsoVideo()">➕ Agregar</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /panel-media -->
+
+  </div><!-- /main -->
+</div><!-- /shell -->
+
+<!-- PRODUCT MODAL -->
+<div class="modal-overlay" id="productModal">
+  <div class="modal">
+    <div class="modal-hd">
+      <h3 id="productModalTitle">➕ Agregar producto</h3>
+      <button class="modal-close" onclick="closeProductModal()">✕</button>
+    </div>
+    <input type="hidden" id="editProductId">
+    <div class="form-row">
+      <div class="fg2"><label>Emoji</label><input type="text" id="pEmoji" placeholder="🍼" maxlength="4"></div>
+      <div class="fg2"><label>Categoría</label>
+        <select id="pCategory">
+          <option value="manuales">✋ Manuales</option>
+          <option value="manos-libres">🔓 Manos Libres</option>
+          <option value="doble">⚡ Doble Extracción</option>
+          <option value="portatiles">📱 Portátiles</option>
+          <option value="accesorios">🎀 Accesorios</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg2"><label>Nombre *</label><input type="text" id="pName" placeholder="Extractor S21 — Si Mamá!!!"></div>
+    <div class="fg2"><label>Descripción</label><textarea id="pDesc" placeholder="Características principales..."></textarea></div>
+    <div class="form-row">
+      <div class="fg2"><label>Precio (Bs.) *</label><input type="number" id="pPrice" placeholder="350" min="1"></div>
+      <div class="fg2"><label>Precio 2 unidades (Bs.)</label><input type="number" id="pPrice2" placeholder="680 (opcional)" min="1"></div>
+    </div>
+    <div class="form-row">
+      <div class="fg2"><label>¿Disponible?</label>
+        <select id="pAvailable"><option value="true">✅ Sí</option><option value="false">❌ No</option></select>
+      </div>
+      <div class="fg2"><label>¿Destacado?</label>
+        <select id="pFeatured"><option value="false">No</option><option value="true">⭐ Sí</option></select>
+      </div>
+    </div>
+
+    <!-- IMAGES -->
+    <div class="fg2">
+      <label>📷 Fotos del producto</label>
+      <div class="img-list" id="productImgList"></div>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:6px">
+        <input type="url" id="newImgUrl" placeholder="URL de imagen (https://...)" style="flex:1;padding:9px 12px;border-radius:12px;border:2px solid var(--beige);background:var(--cream);font-family:'Nunito',sans-serif;font-size:.88rem;outline:none;">
+        <button class="btn btn-info btn-sm" onclick="addProductImage()">➕ Añadir</button>
+      </div>
+      <p style="font-size:.72rem;color:var(--text-l);font-weight:600;margin-top:5px">💡 Usa links de Google Drive (con acceso público), Imgur, o cualquier URL directa de imagen.</p>
+    </div>
+
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="closeProductModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveProduct()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════
+// CONFIG
+// ══════════════════════════════════
+const ADMIN_USER = 'admin';
+const ADMIN_PASS = 'mamita2026';
+
+// ══════════════════════════════════
+// DEFAULT PRODUCTS
+// ══════════════════════════════════
+const DEFAULT_PRODUCTS = [
+  {id:'p1', name:'Extractor Manual NIKI',        category:'manuales',    price:90,  price2:null, desc:'BPA 0%. Ideal para uso ocasional.',                                          emoji:'🤱', images:[], available:true, featured:true},
+  {id:'p2', name:'Extractor Manual HAHA PRINCE', category:'manuales',    price:120, price2:null, desc:'BPA 0%. Succionador con doble nivel.',                                       emoji:'🤱', images:[], available:true, featured:true},
+  {id:'p3', name:'Extractor INTELLIGENT RH228',  category:'doble',       price:300, price2:null, desc:'Alta fuerza. 2 modos, 5 niveles. Doble extracción. Debe permanecer conectado.', emoji:'⚡', images:[], available:true, featured:true},
+  {id:'p4', name:'Extractor Eléctrico Doble USB',category:'doble',       price:350, price2:null, desc:'Sistema con manguera, doble tetero. Vía USB.',                              emoji:'⚡', images:[], available:true, featured:false},
+  {id:'p5', name:'Extractor RB-608',             category:'manos-libres',price:350, price2:null, desc:'Portátil, inalámbrico. 3 modos × 9 niveles. BPA Free ~180 ml.',             emoji:'🌸', images:[], available:true, featured:true},
+  {id:'p6', name:'Extractor MY-376',             category:'manos-libres',price:350, price2:680,  desc:'3 modos × 9 niveles. Batería recargable. 180 ml.',                          emoji:'🌸', images:[], available:true, featured:false},
+  {id:'p7', name:'Extractor MY-379',             category:'manos-libres',price:400, price2:780,  desc:'4 modos × 12 niveles. Anti-caídas, doble ritmo.',                           emoji:'🌸', images:[], available:true, featured:false},
+  {id:'p8', name:'Extractor RH-289',             category:'portatiles',  price:320, price2:null, desc:'Eléctrico inalámbrico. 3 modos × 9 niveles. Incluye biberón y cojín.',     emoji:'🌸', images:[], available:true, featured:false},
+  {id:'p9', name:'Extractor RH-668',             category:'manos-libres',price:550, price2:null, desc:'3 modos × 9 niveles. Silicona alimenticia. Vaso de vidrio.',               emoji:'💎', images:[], available:true, featured:false},
+  {id:'p10',name:'Extractor MY 382.1',           category:'manos-libres',price:600, price2:1100, desc:'4 modos × 12 niveles. Incluye repuestos.',                                  emoji:'⭐', images:[], available:true, featured:false},
+  {id:'p11',name:'Extractor S21 — Si Mamá!!!',   category:'manos-libres',price:800, price2:null, desc:'3 modos × 12 niveles. Garantía 1 año. BPA Free.',                          emoji:'👑', images:[], available:true, featured:false},
+  {id:'p12',name:'Extractor S32 — Si Mamá!!!',   category:'manos-libres',price:900, price2:null, desc:'4 modos × 9 niveles. Garantía 1 año. BPA Free.',                           emoji:'👑', images:[], available:true, featured:false},
+  {id:'p13',name:'Extractor S33 — Si Mamá!!!',   category:'manos-libres',price:1000,price2:null, desc:'4 modos × 9 niveles. Garantía 1 año. Luz LED nocturna.',                  emoji:'👑', images:[], available:true, featured:false},
+  {id:'p14',name:'Extractor MY 375/378',         category:'manos-libres',price:500, price2:880,  desc:'4 modos × 12 niveles. Incluye repuestos.',                                  emoji:'🌟', images:[], available:true, featured:false},
+  {id:'p15',name:'Extractor MY 375',             category:'manos-libres',price:500, price2:950,  desc:'4 modos × 12 niveles. 2 bridas, cable, repuesto de válvula.',              emoji:'🌟', images:[], available:true, featured:false},
+  {id:'p16',name:'Vaso de Vidrio 210 ml',        category:'accesorios',  price:35,  price2:null, desc:'Con tapa de plástico.',                                                     emoji:'🥛', images:[], available:true, featured:false},
+  {id:'p17',name:'Vaso de Vidrio 180 ml',        category:'accesorios',  price:25,  price2:null, desc:'Con tapa de plástico.',                                                     emoji:'🥛', images:[], available:true, featured:false},
+  {id:'p18',name:'Recolectoras de Leche × 6',    category:'accesorios',  price:65,  price2:null, desc:'Set 6 recolectoras. Marca Only.',                                          emoji:'🍼', images:[], available:true, featured:false},
+  {id:'p19',name:'Insertos de Brida 19/21 mm',   category:'accesorios',  price:30,  price2:null, desc:'Adaptadores de pezón 19 o 21 mm.',                                         emoji:'🔧', images:[], available:true, featured:false},
+  {id:'p20',name:'Inserto de Brida 15/17 mm',    category:'accesorios',  price:60,  price2:null, desc:'Para pezones más pequeños.',                                                emoji:'🔧', images:[], available:true, featured:false},
+  {id:'p21',name:'Recolector Manual Silicona 80ml',category:'accesorios',price:60,  price2:null, desc:'Portátil, suave.',                                                          emoji:'🌿', images:[], available:true, featured:false},
+  {id:'p22',name:'Bolso Térmico Banco de Leche', category:'accesorios',  price:260, price2:null, desc:'2 refrigerantes y 3 vasos.',                                               emoji:'🧊', images:[], available:true, featured:false},
+  {id:'p23',name:'Bolsitas 200 ml × 30 uds',     category:'accesorios',  price:60,  price2:null, desc:'BPA Free. Para almacenar leche materna.',                                  emoji:'🛍️', images:[], available:true, featured:false},
+  {id:'p24',name:'Bolsitas Si Mamá 200ml × 30',  category:'accesorios',  price:60,  price2:null, desc:'Bolsitas de la marca Si Mamá!!!',                                          emoji:'🛍️', images:[], available:true, featured:false},
+  {id:'p25',name:'Bolsitas 200 ml × 60 uds',     category:'accesorios',  price:100, price2:null, desc:'Mayor cantidad para mamás.',                                               emoji:'🛍️', images:[], available:true, featured:false},
+  {id:'p26',name:'Vasos de Almacenamiento × 6',  category:'accesorios',  price:130, price2:null, desc:'Con tapa. Aptos para freezer.',                                            emoji:'🥛', images:[], available:true, featured:false},
+  {id:'p27',name:'Formador de Pezón (silicona)',  category:'accesorios',  price:35,  price2:null, desc:'Para preparar el pezón.',                                                  emoji:'🌸', images:[], available:true, featured:false},
+  {id:'p28',name:'Calentador Biberones Portátil', category:'accesorios',  price:100, price2:null, desc:'Compacto, funciona conectado.',                                            emoji:'🌡️', images:[], available:true, featured:false},
+];
+
+// ══════════════════════════════════
+// AUTH
+// ══════════════════════════════════
+function doLogin(){
+  const u=document.getElementById('loginUser').value.trim();
+  const p=document.getElementById('loginPass').value;
+  if(u===ADMIN_USER && p===ADMIN_PASS){
+    document.getElementById('loginWrap').style.display='none';
+    document.getElementById('adminShell').style.display='block';
+    initAdmin();
+  } else {
+    document.getElementById('loginErr').style.display='block';
+    setTimeout(()=>document.getElementById('loginErr').style.display='none',3000);
+  }
+}
+function doLogout(){
+  document.getElementById('adminShell').style.display='none';
+  document.getElementById('loginWrap').style.display='flex';
+  document.getElementById('loginUser').value='';
+  document.getElementById('loginPass').value='';
+}
+document.getElementById('loginPass').addEventListener('keyup',e=>{ if(e.key==='Enter') doLogin(); });
+
+// ══════════════════════════════════
+// STORAGE
+// ══════════════════════════════════
+function getProducts(){
+  const s=localStorage.getItem('simama_products');
+  if(s){ const p=JSON.parse(s); return p.length?p:DEFAULT_PRODUCTS; }
+  const p=[...DEFAULT_PRODUCTS]; localStorage.setItem('simama_products',JSON.stringify(p)); return p;
+}
+function setProducts(p){ localStorage.setItem('simama_products',JSON.stringify(p)); }
+function getOrders(){ return JSON.parse(localStorage.getItem('simama_orders')||'[]'); }
+function setOrders(o){ localStorage.setItem('simama_orders',JSON.stringify(o)); }
+function getMedia(k){ return JSON.parse(localStorage.getItem(k)||'[]'); }
+function setMedia(k,v){ localStorage.setItem(k,JSON.stringify(v)); }
+
+// ══════════════════════════════════
+// INIT & NAV
+// ══════════════════════════════════
+function initAdmin(){ renderDashboard(); renderProductsTable(); renderOrdersTable(); updateBadge(); renderMediaPanels(); }
+function goPanel(name){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  document.getElementById('sb-'+name).classList.add('active');
+  document.getElementById('sidebar').classList.remove('mob-open');
+  if(name==='dashboard') renderDashboard();
+  if(name==='products')  renderProductsTable();
+  if(name==='orders')    renderOrdersTable();
+  if(name==='media')     renderMediaPanels();
+}
+function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('mob-open'); }
+
+// ══════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════
+function renderDashboard(){
+  const products=getProducts(), orders=getOrders();
+  const pending=orders.filter(o=>o.estado==='pendiente').length;
+  const totalBs=orders.reduce((s,o)=>s+(o.total||0),0);
+  document.getElementById('statsGrid').innerHTML=`
+    <div class="stat-card"><div class="stat-icon">📦</div><div class="stat-val">${products.length}</div><div class="stat-lab">Productos</div></div>
+    <div class="stat-card"><div class="stat-icon">🛍️</div><div class="stat-val">${orders.length}</div><div class="stat-lab">Pedidos</div></div>
+    <div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-val">${pending}</div><div class="stat-lab">Pendientes</div></div>
+    <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-val">${orders.filter(o=>o.estado==='entregado').length}</div><div class="stat-lab">Entregados</div></div>
+    <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-val">${totalBs}</div><div class="stat-lab">Bs. Total</div></div>`;
+  const recent=[...orders].reverse().slice(0,6);
+  document.getElementById('recentTbody').innerHTML = recent.length
+    ? recent.map(o=>`<tr><td style="font-size:.78rem;white-space:nowrap">${o.fecha}</td><td>${o.cliente}</td><td>${o.product}</td><td><strong>${o.total} Bs.</strong></td><td>${statusBadge(o.estado)}</td></tr>`).join('')
+    : '<tr class="empty-row"><td colspan="5">📭 No hay pedidos aún</td></tr>';
+}
+
+// ══════════════════════════════════
+// PRODUCTS TABLE
+// ══════════════════════════════════
+function renderProductsTable(){
+  const q=(document.getElementById('prodSearch').value||'').toLowerCase();
+  const products=getProducts().filter(p=>!q||p.name.toLowerCase().includes(q)||p.category.includes(q));
+  document.getElementById('productsTbody').innerHTML = products.length
+    ? products.map(p=>`<tr>
+        <td style="font-size:1.3rem">${p.emoji||'🍼'}</td>
+        <td><strong>${p.name}</strong></td>
+        <td style="font-size:.76rem;color:var(--text-l);font-weight:700">${p.category}</td>
+        <td><strong>${p.price} Bs.</strong></td>
+        <td>${p.price2?p.price2+' Bs.':'—'}</td>
+        <td><span style="font-size:.78rem;color:var(--text-l)">${(p.images&&p.images.length)||0} foto(s)</span></td>
+        <td><span class="${p.available?'avail-yes':'avail-no'}">${p.available?'✅ Sí':'❌ No'}</span></td>
+        <td><div class="td-actions">
+          <button class="btn btn-ghost btn-sm" onclick="openProductModal('${p.id}')">✏️ Editar</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p.id}')">🗑️</button>
+        </div></td></tr>`).join('')
+    : '<tr class="empty-row"><td colspan="8">📭 Sin productos</td></tr>';
+}
+
+// ══════════════════════════════════
+// PRODUCT MODAL + IMAGES
+// ══════════════════════════════════
+let editingImages = [];
+
+function openProductModal(id){
+  const products=getProducts();
+  const editing = id ? products.find(p=>p.id===id) : null;
+  document.getElementById('editProductId').value=id||'';
+  document.getElementById('productModalTitle').textContent=editing?'✏️ Editar producto':'➕ Agregar producto';
+  document.getElementById('pEmoji').value=editing?.emoji||'🍼';
+  document.getElementById('pName').value=editing?.name||'';
+  document.getElementById('pDesc').value=editing?.desc||'';
+  document.getElementById('pPrice').value=editing?.price||'';
+  document.getElementById('pPrice2').value=editing?.price2||'';
+  document.getElementById('pCategory').value=editing?.category||'portatiles';
+  document.getElementById('pAvailable').value=(editing?.available!==false)?'true':'false';
+  document.getElementById('pFeatured').value=editing?.featured?'true':'false';
+  editingImages=[...(editing?.images||[])];
+  renderEditingImages();
+  document.getElementById('newImgUrl').value='';
+  document.getElementById('productModal').classList.add('open');
+}
+function closeProductModal(){ document.getElementById('productModal').classList.remove('open'); editingImages=[]; }
+
+function renderEditingImages(){
+  const list=document.getElementById('productImgList');
+  list.innerHTML = editingImages.map((src,i)=>`
+    <div class="img-thumb">
+      <img src="${src}" onerror="this.src='data:image/svg+xml,<svg xmlns=\\'http://www.w3.org/2000/svg\\'><text y=\\'15\\'>❌</text></svg>'">
+      <button class="del-btn" onclick="removeImage(${i})">✕</button>
+    </div>`).join('');
+  // add button
+  list.innerHTML += `<button class="img-add-btn" onclick="document.getElementById('newImgUrl').focus()"><span>➕</span>URL</button>`;
+}
+function removeImage(i){ editingImages.splice(i,1); renderEditingImages(); }
+function addProductImage(){
+  const url=document.getElementById('newImgUrl').value.trim();
+  if(!url){ showToast('❌ Pega una URL de imagen','error'); return; }
+  editingImages.push(url);
+  renderEditingImages();
+  document.getElementById('newImgUrl').value='';
+  showToast('✅ Imagen añadida','success');
+}
+
+function saveProduct(){
+  const id=document.getElementById('editProductId').value;
+  const name=document.getElementById('pName').value.trim();
+  const price=parseFloat(document.getElementById('pPrice').value);
+  if(!name||!price){ showToast('❌ Nombre y precio son obligatorios','error'); return; }
+  const p2v=document.getElementById('pPrice2').value;
+  const prod={
+    id: id||'p-'+Date.now(),
+    name, desc:document.getElementById('pDesc').value.trim(),
+    price, price2:p2v?parseFloat(p2v):null,
+    emoji:document.getElementById('pEmoji').value.trim()||'🍼',
+    category:document.getElementById('pCategory').value,
+    available:document.getElementById('pAvailable').value==='true',
+    featured:document.getElementById('pFeatured').value==='true',
+    images:[...editingImages],
+  };
+  let products=getProducts();
+  if(id){ const idx=products.findIndex(p=>p.id===id); if(idx>-1)products[idx]=prod; else products.push(prod); showToast('✅ Producto actualizado','success'); }
+  else { products.push(prod); showToast('✅ Producto agregado','success'); }
+  setProducts(products);
+  closeProductModal(); renderProductsTable(); renderDashboard();
+}
+function deleteProduct(id){
+  if(!confirm('¿Eliminar este producto?')) return;
+  setProducts(getProducts().filter(p=>p.id!==id));
+  renderProductsTable(); renderDashboard();
+  showToast('🗑️ Eliminado');
+}
+
+// ══════════════════════════════════
+// ORDERS
+// ══════════════════════════════════
+function renderOrdersTable(){
+  updateBadge();
+  const q=(document.getElementById('orderSearch').value||'').toLowerCase();
+  const orders=getOrders().filter(o=>!q||o.cliente.toLowerCase().includes(q)||o.product.toLowerCase().includes(q)||o.telefono.includes(q));
+  document.getElementById('ordersTbody').innerHTML = orders.length
+    ? [...orders].reverse().map(o=>`<tr>
+        <td style="font-size:.76rem;white-space:nowrap">${o.fecha}</td>
+        <td><strong>${o.cliente}</strong></td>
+        <td><a href="https://wa.me/${o.telefono.replace(/\D/g,'')}" target="_blank" style="color:var(--mint-d);font-weight:700;text-decoration:none">📱 ${o.telefono}</a></td>
+        <td>${o.product}</td>
+        <td style="text-align:center">${o.cantidad}</td>
+        <td><strong>${o.total} Bs.</strong></td>
+        <td style="font-size:.78rem;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${o.direccion}">${o.direccion}</td>
+        <td>${statusBadge(o.estado)}</td>
+        <td><select class="order-sel" onchange="changeStatus('${o.id}',this.value)">
+          <option value="pendiente" ${o.estado==='pendiente'?'selected':''}>⏳ Pendiente</option>
+          <option value="enviado"   ${o.estado==='enviado'?'selected':''}>🚚 Enviado</option>
+          <option value="entregado" ${o.estado==='entregado'?'selected':''}>✅ Entregado</option>
+        </select></td></tr>`).join('')
+    : '<tr class="empty-row"><td colspan="9">📭 No hay pedidos aún</td></tr>';
+}
+function changeStatus(id,status){
+  const orders=getOrders(); const o=orders.find(x=>x.id===id);
+  if(o){ o.estado=status; setOrders(orders); updateBadge(); renderDashboard(); showToast('✅ Estado actualizado','success'); }
+}
+function clearOrders(){ if(!confirm('¿Eliminar TODOS los pedidos?')) return; setOrders([]); renderOrdersTable(); renderDashboard(); showToast('🗑️ Pedidos eliminados'); }
+function updateBadge(){
+  const n=getOrders().filter(o=>o.estado==='pendiente').length;
+  const b=document.getElementById('pendingBadge');
+  b.style.display=n?'inline':'none'; b.textContent=n;
+}
+
+// ══════════════════════════════════
+// MEDIA PANELS
+// ══════════════════════════════════
+function renderMediaPanels(){
+  renderFeriasFotos();
+  renderFeriasVideos();
+  renderUsoVideos();
+}
+
+function switchMediaTab(tab){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>{
+    const tabs=['ferias-fotos','ferias-videos','uso-videos'];
+    b.classList.toggle('active',tabs[i]===tab);
+  });
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('mt-'+tab).classList.add('active');
+}
+
+// FERIAS FOTOS
+function renderFeriasFotos(){
+  const items=getMedia('simama_ferias_fotos');
+  document.getElementById('feriasFotosList').innerHTML = items.length
+    ? items.map((f,i)=>`<div class="media-row">
+        <div class="media-row-info">${f.label||'Foto de feria'}<small>${f.url.slice(0,60)}...</small></div>
+        <button class="btn btn-danger btn-sm" onclick="removeFeriaFoto(${i})">🗑️</button>
+      </div>`).join('')
+    : '<p style="color:var(--text-l);font-size:.83rem;font-weight:600">Sin fotos agregadas aún.</p>';
+}
+function addFeriaFoto(){
+  const url=document.getElementById('ffUrl').value.trim();
+  if(!url){ showToast('❌ URL requerida','error'); return; }
+  const label=document.getElementById('ffLabel').value.trim();
+  const items=getMedia('simama_ferias_fotos');
+  items.push({url,label});
+  setMedia('simama_ferias_fotos',items);
+  document.getElementById('ffUrl').value='';
+  document.getElementById('ffLabel').value='';
+  renderFeriasFotos(); showToast('✅ Foto agregada','success');
+}
+function removeFeriaFoto(i){
+  const items=getMedia('simama_ferias_fotos'); items.splice(i,1);
+  setMedia('simama_ferias_fotos',items); renderFeriasFotos(); showToast('🗑️ Eliminada');
+}
+
+// FERIAS VIDEOS
+function renderFeriasVideos(){
+  const items=getMedia('simama_ferias_videos');
+  document.getElementById('feriasVideosList').innerHTML = items.length
+    ? items.map((v,i)=>`<div class="media-row">
+        <div class="media-row-info">${v.label||'Video de feria'} <span style="background:var(--sky-l);color:#0c6698;padding:2px 8px;border-radius:50px;font-size:.68rem;font-weight:800">${v.type}</span><small>${v.url.slice(0,60)}...</small></div>
+        <button class="btn btn-danger btn-sm" onclick="removeFeriaVideo(${i})">🗑️</button>
+      </div>`).join('')
+    : '<p style="color:var(--text-l);font-size:.83rem;font-weight:600">Sin videos agregados aún.</p>';
+}
+function addFeriaVideo(){
+  const url=document.getElementById('fvUrl').value.trim();
+  if(!url){ showToast('❌ URL requerida','error'); return; }
+  const label=document.getElementById('fvLabel').value.trim();
+  const type=document.getElementById('fvType').value;
+  const items=getMedia('simama_ferias_videos');
+  items.push({url,label,type});
+  setMedia('simama_ferias_videos',items);
+  document.getElementById('fvUrl').value='';
+  document.getElementById('fvLabel').value='';
+  renderFeriasVideos(); showToast('✅ Video agregado','success');
+}
+function removeFeriaVideo(i){
+  const items=getMedia('simama_ferias_videos'); items.splice(i,1);
+  setMedia('simama_ferias_videos',items); renderFeriasVideos(); showToast('🗑️ Eliminado');
+}
+
+// USO VIDEOS
+function renderUsoVideos(){
+  const items=getMedia('simama_uso_videos');
+  document.getElementById('usoVideosList').innerHTML = items.length
+    ? items.map((v,i)=>`<div class="media-row">
+        <div class="media-row-info">${v.label||'Video de uso'} <span style="background:var(--mint-l);color:var(--mint-d);padding:2px 8px;border-radius:50px;font-size:.68rem;font-weight:800">${v.type}</span><small>${v.desc||''} · ${v.url.slice(0,50)}...</small></div>
+        <button class="btn btn-danger btn-sm" onclick="removeUsoVideo(${i})">🗑️</button>
+      </div>`).join('')
+    : '<p style="color:var(--text-l);font-size:.83rem;font-weight:600">Sin videos de uso agregados aún.</p>';
+}
+function addUsoVideo(){
+  const url=document.getElementById('uvUrl').value.trim();
+  if(!url){ showToast('❌ URL requerida','error'); return; }
+  const label=document.getElementById('uvLabel').value.trim();
+  const desc=document.getElementById('uvDesc').value.trim();
+  const type=document.getElementById('uvType').value;
+  const items=getMedia('simama_uso_videos');
+  items.push({url,label,desc,type});
+  setMedia('simama_uso_videos',items);
+  document.getElementById('uvUrl').value='';
+  document.getElementById('uvLabel').value='';
+  document.getElementById('uvDesc').value='';
+  renderUsoVideos(); showToast('✅ Video agregado','success');
+}
+function removeUsoVideo(i){
+  const items=getMedia('simama_uso_videos'); items.splice(i,1);
+  setMedia('simama_uso_videos',items); renderUsoVideos(); showToast('🗑️ Eliminado');
+}
+
+// ══════════════════════════════════
+// HELPERS
+// ══════════════════════════════════
+function statusBadge(s){
+  const m={pendiente:`<span class="status-badge s-pending">⏳ Pendiente</span>`,enviado:`<span class="status-badge s-sent">🚚 Enviado</span>`,entregado:`<span class="status-badge s-delivered">✅ Entregado</span>`};
+  return m[s]||`<span class="status-badge s-pending">${s}</span>`;
+}
+function showToast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast '+(type||'');
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+document.getElementById('productModal').addEventListener('click',function(e){ if(e.target===this) closeProductModal(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Si Mamá!!! Bolivia — Especialistas en Lactancia</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap" rel="stylesheet">
+<style>
+:root{
+  --rose:#f9a8c9;--rose-d:#f472a8;--rose-l:#fde8f2;
+  --mint:#a8e6cf;--mint-d:#5bbd8e;--mint-l:#e8f8f2;
+  --sky:#b8dff5;--sky-l:#e8f4fd;
+  --cream:#fff8f0;--beige:#f5ede0;
+  --text:#4a3f4a;--text-l:#9b8da0;
+  --shadow:0 4px 24px rgba(180,120,160,.13);
+  --shadow-h:0 8px 32px rgba(180,120,160,.22);
+  --radius:20px;--radius-l:32px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;}
+
+/* ── NAV ── */
+nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.93);backdrop-filter:blur(12px);border-bottom:2px solid var(--rose-l);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:62px;box-shadow:0 2px 16px rgba(249,168,201,.15);}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;cursor:pointer;}
+.nav-logo-icon{font-size:26px;}
+.nav-logo-text{font-family:'Pacifico',cursive;font-size:1.2rem;color:var(--rose-d);line-height:1.1;}
+.nav-logo-text span{display:block;font-family:'Nunito',sans-serif;font-size:.62rem;color:var(--text-l);font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.nav-links{display:flex;gap:4px;align-items:center;}
+.nav-links a{padding:7px 13px;border-radius:50px;text-decoration:none;font-weight:700;font-size:.85rem;color:var(--text-l);transition:all .2s;cursor:pointer;}
+.nav-links a:hover,.nav-links a.active{background:var(--rose-l);color:var(--rose-d);}
+.nav-right{display:flex;align-items:center;gap:8px;}
+.nav-menu-btn{display:none;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text);}
+@media(max-width:700px){
+  .nav-links{display:none;position:fixed;top:62px;left:0;right:0;background:white;flex-direction:column;padding:12px;gap:3px;border-bottom:2px solid var(--rose-l);box-shadow:var(--shadow);}
+  .nav-links.open{display:flex;}
+  .nav-menu-btn{display:block;}
+}
+
+/* ── CART BUTTON ── */
+.cart-btn{position:relative;background:linear-gradient(135deg,var(--rose-d),#e05f9a);border:none;border-radius:50px;padding:9px 18px;cursor:pointer;color:white;font-family:'Nunito',sans-serif;font-weight:800;font-size:.88rem;display:flex;align-items:center;gap:6px;box-shadow:0 3px 12px rgba(244,114,168,.35);transition:all .2s;flex-shrink:0;}
+.cart-btn:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(244,114,168,.5);}
+.cart-count{background:white;color:var(--rose-d);border-radius:50%;width:20px;height:20px;font-size:.72rem;font-weight:900;display:flex;align-items:center;justify-content:center;}
+.cart-count.hidden{display:none;}
+
+/* ── CART DRAWER ── */
+.cart-overlay{display:none;position:fixed;inset:0;background:rgba(74,63,74,.45);backdrop-filter:blur(3px);z-index:300;}
+.cart-overlay.open{display:block;}
+.cart-drawer{position:fixed;right:0;top:0;bottom:0;width:min(400px,100vw);background:white;z-index:301;display:flex;flex-direction:column;box-shadow:-8px 0 40px rgba(74,63,74,.2);transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);}
+.cart-drawer.open{transform:translateX(0);}
+.cart-header{padding:20px 20px 16px;border-bottom:2px solid var(--beige);display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,var(--rose-l),var(--sky-l));}
+.cart-header h2{font-size:1.15rem;font-weight:900;color:var(--text);display:flex;align-items:center;gap:8px;}
+.cart-close-btn{background:white;border:none;border-radius:50%;width:34px;height:34px;cursor:pointer;font-size:1rem;color:var(--rose-d);box-shadow:var(--shadow);transition:background .2s;}
+.cart-close-btn:hover{background:var(--rose-l);}
+.cart-items{flex:1;overflow-y:auto;padding:16px;}
+.cart-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--text-l);}
+.cart-empty span{font-size:3.5rem;}
+.cart-empty p{font-weight:700;font-size:.95rem;}
+.cart-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--beige);align-items:flex-start;}
+.cart-item:last-child{border-bottom:none;}
+.cart-item-emoji{font-size:2.2rem;flex-shrink:0;width:48px;height:48px;background:var(--rose-l);border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.cart-item-emoji img{width:100%;height:100%;object-fit:cover;}
+.cart-item-info{flex:1;min-width:0;}
+.cart-item-name{font-weight:800;font-size:.9rem;color:var(--text);line-height:1.3;margin-bottom:4px;}
+.cart-item-price{color:var(--rose-d);font-weight:900;font-size:.9rem;}
+.cart-item-controls{display:flex;align-items:center;gap:6px;margin-top:6px;}
+.qty-btn{background:var(--beige);border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:1rem;font-weight:900;color:var(--text);display:flex;align-items:center;justify-content:center;transition:background .2s;flex-shrink:0;}
+.qty-btn:hover{background:var(--rose-l);color:var(--rose-d);}
+.qty-val{font-weight:800;font-size:.9rem;min-width:24px;text-align:center;}
+.cart-item-del{background:none;border:none;cursor:pointer;color:#ccc;font-size:1.1rem;margin-left:auto;transition:color .2s;padding:4px;}
+.cart-item-del:hover{color:#ff6b6b;}
+.cart-footer{padding:16px 20px;border-top:2px solid var(--beige);background:var(--cream);}
+.cart-subtotal{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.cart-subtotal span{font-weight:700;color:var(--text-l);font-size:.9rem;}
+.cart-subtotal strong{font-size:1.3rem;font-weight:900;color:var(--text);}
+.cart-note{font-size:.75rem;color:var(--text-l);font-weight:600;margin-bottom:14px;line-height:1.5;}
+.btn-checkout{width:100%;padding:14px;border-radius:50px;border:none;cursor:pointer;background:linear-gradient(135deg,#25d366,#128c7e);color:white;font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;box-shadow:0 4px 16px rgba(37,211,102,.35);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-checkout:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(37,211,102,.45);}
+.btn-clear-cart{width:100%;padding:9px;border-radius:50px;border:2px solid var(--beige);background:none;cursor:pointer;color:var(--text-l);font-family:'Nunito',sans-serif;font-weight:700;font-size:.82rem;margin-top:8px;transition:all .2s;}
+.btn-clear-cart:hover{border-color:#ff6b6b;color:#ff6b6b;}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(135deg,#fde8f2 0%,#e8f4fd 50%,#e8f8f2 100%);padding:44px 24px 52px;text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-60px;right:-60px;width:220px;height:220px;border-radius:50%;background:rgba(249,168,201,.2);pointer-events:none;}
+.hero::after{content:'';position:absolute;bottom:-40px;left:-40px;width:160px;height:160px;border-radius:50%;background:rgba(168,230,207,.25);pointer-events:none;}
+.hero-badge{display:inline-block;background:var(--rose-l);color:var(--rose-d);font-weight:800;font-size:.78rem;letter-spacing:.5px;text-transform:uppercase;padding:5px 16px;border-radius:50px;margin-bottom:14px;}
+.hero h1{font-family:'Pacifico',cursive;font-size:clamp(1.9rem,6vw,3rem);color:var(--rose-d);line-height:1.2;margin-bottom:10px;}
+.hero p{font-size:1rem;color:var(--text-l);max-width:460px;margin:0 auto 26px;font-weight:600;line-height:1.6;}
+.hero-cta{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--rose-d),#e05f9a);color:white;padding:13px 30px;border-radius:50px;font-weight:800;font-size:.95rem;text-decoration:none;box-shadow:0 4px 20px rgba(244,114,168,.45);transition:transform .2s,box-shadow .2s;cursor:pointer;border:none;font-family:'Nunito',sans-serif;}
+.hero-cta:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(244,114,168,.5);}
+.hero-bubbles{display:flex;justify-content:center;gap:16px;margin-top:32px;flex-wrap:wrap;}
+.hero-bubble{background:white;border-radius:var(--radius);padding:12px 18px;text-align:center;box-shadow:var(--shadow);min-width:90px;animation:float 3s ease-in-out infinite;}
+.hero-bubble:nth-child(2){animation-delay:.5s;}
+.hero-bubble:nth-child(3){animation-delay:1s;}
+.hero-bubble:nth-child(4){animation-delay:1.5s;}
+.hero-bubble .bico{font-size:1.5rem;margin-bottom:3px;}
+.hero-bubble span{display:block;font-size:.72rem;font-weight:700;color:var(--text-l);}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+
+/* ── SECTIONS ── */
+.section-title{text-align:center;padding:36px 16px 6px;font-size:1.5rem;font-weight:900;color:var(--text);}
+.section-title span{color:var(--rose-d);}
+.section-sub{text-align:center;color:var(--text-l);font-weight:600;font-size:.92rem;margin-bottom:24px;}
+
+/* ── CAT TABS ── */
+.cat-tabs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:8px 16px 20px;max-width:960px;margin:0 auto;}
+.cat-tab{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 18px;border-radius:18px;border:2px solid transparent;font-family:'Nunito',sans-serif;font-weight:800;font-size:.8rem;cursor:pointer;background:white;color:var(--text-l);transition:all .22s;box-shadow:0 2px 10px rgba(0,0,0,.06);min-width:80px;}
+.cat-tab .ti{font-size:1.6rem;}
+.cat-tab:hover{border-color:var(--rose);color:var(--rose-d);}
+.cat-tab.active{background:linear-gradient(135deg,var(--rose-d),#e05f9a);color:white;border-color:transparent;box-shadow:0 4px 14px rgba(244,114,168,.38);}
+
+/* ── PRODUCT GRID ── */
+.product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:18px;padding:0 16px 36px;max-width:1100px;margin:0 auto;}
+.product-card{background:white;border-radius:var(--radius-l);overflow:hidden;box-shadow:var(--shadow);transition:transform .25s,box-shadow .25s;display:flex;flex-direction:column;position:relative;}
+.product-card:hover{transform:translateY(-5px);box-shadow:var(--shadow-h);}
+
+/* GALLERY */
+.card-gallery{position:relative;width:100%;height:200px;overflow:hidden;background:linear-gradient(135deg,var(--rose-l),var(--sky-l));}
+.card-gallery-inner{display:flex;height:100%;transition:transform .35s ease;}
+.card-gallery-slide{min-width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
+.card-gallery-slide img{width:100%;height:100%;object-fit:contain;padding:12px;}
+.card-gallery-slide .placeholder{font-size:4rem;}
+.gallery-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.85);border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.15);transition:background .2s;z-index:2;}
+.gallery-btn:hover{background:white;}
+.gallery-prev{left:8px;}.gallery-next{right:8px;}
+.gallery-dots{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);display:flex;gap:4px;}
+.gallery-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.6);cursor:pointer;transition:background .2s;}
+.gallery-dot.active{background:var(--rose-d);}
+
+.card-body{padding:14px 16px 18px;flex:1;display:flex;flex-direction:column;}
+.card-category{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--mint-d);margin-bottom:5px;}
+.card-name{font-size:.98rem;font-weight:800;color:var(--text);margin-bottom:7px;line-height:1.3;}
+.card-desc{font-size:.8rem;color:var(--text-l);font-weight:600;line-height:1.5;flex:1;margin-bottom:10px;}
+.card-price{font-size:1.3rem;font-weight:900;color:var(--rose-d);margin-bottom:10px;}
+.card-price small{font-size:.78rem;color:var(--text-l);font-weight:600;}
+.card-actions{display:flex;gap:8px;}
+.btn-cart{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:50px;border:2px solid var(--rose);background:white;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;font-size:.86rem;color:var(--rose-d);transition:all .2s;}
+.btn-cart:hover{background:var(--rose-l);}
+.btn-cart.in-cart{background:var(--rose-l);border-color:var(--rose-d);}
+.btn-pedir{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border-radius:50px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--rose-d),#e05f9a);color:white;font-family:'Nunito',sans-serif;font-weight:800;font-size:.86rem;box-shadow:0 3px 10px rgba(244,114,168,.32);transition:all .2s;}
+.btn-pedir:hover{transform:translateY(-1px);}
+
+/* ── ABOUT ── */
+.about-hero{max-width:860px;margin:0 auto 28px;background:white;border-radius:var(--radius-l);padding:28px;box-shadow:var(--shadow);text-align:center;}
+.about-hero h2{font-family:'Pacifico',cursive;color:var(--rose-d);font-size:1.7rem;margin-bottom:10px;}
+.about-hero p{color:var(--text-l);font-weight:600;line-height:1.7;font-size:.92rem;max-width:580px;margin:0 auto;}
+.about-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;max-width:860px;margin:0 auto 32px;padding:0 16px;}
+.about-card{background:white;border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);text-align:center;}
+.about-icon{font-size:2.2rem;margin-bottom:10px;}
+.about-card h3{font-size:1rem;font-weight:900;color:var(--text);margin-bottom:6px;}
+.about-card p{font-size:.82rem;color:var(--text-l);font-weight:600;line-height:1.5;}
+
+/* MEDIA */
+.media-section{max-width:900px;margin:0 auto 32px;padding:0 16px;}
+.media-section h3{font-size:1.15rem;font-weight:900;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;}
+.media-item{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);background:white;cursor:pointer;transition:transform .2s;}
+.media-item:hover{transform:scale(1.02);}
+.media-item img{width:100%;height:160px;object-fit:cover;display:block;}
+.media-item .media-label{padding:8px 12px;font-size:.78rem;font-weight:700;color:var(--text-l);}
+.media-placeholder{height:160px;background:linear-gradient(135deg,var(--beige),var(--rose-l));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:2px dashed var(--rose);border-radius:var(--radius);color:var(--rose-d);font-weight:800;font-size:.85rem;padding:12px;text-align:center;}
+.media-placeholder span{font-size:2rem;}
+
+/* USO */
+.uso-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;max-width:900px;margin:0 auto;padding:0 16px;}
+.uso-card{background:white;border-radius:var(--radius-l);overflow:hidden;box-shadow:var(--shadow);}
+.uso-card video,.uso-card iframe{width:100%;height:190px;object-fit:cover;display:block;border:none;}
+.uso-card .uso-info{padding:12px 16px 16px;}
+.uso-card .uso-info h4{font-weight:800;font-size:.95rem;color:var(--text);margin-bottom:4px;}
+.uso-card .uso-info p{font-size:.8rem;color:var(--text-l);font-weight:600;}
+.uso-placeholder{height:190px;background:linear-gradient(135deg,var(--sky-l),var(--mint-l));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--text-l);font-weight:700;font-size:.82rem;text-align:center;padding:12px;}
+.uso-placeholder span{font-size:2.5rem;}
+
+/* LOCATION */
+.location-card{max-width:680px;margin:0 auto;background:white;border-radius:var(--radius-l);padding:28px;box-shadow:var(--shadow);}
+.location-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--beige);}
+.location-item:last-child{border-bottom:none;}
+.location-icon{font-size:1.5rem;flex-shrink:0;margin-top:2px;}
+.location-item h4{font-weight:800;color:var(--text);margin-bottom:3px;}
+.location-item p{font-size:.88rem;color:var(--text-l);font-weight:600;}
+.map-link{background:linear-gradient(135deg,var(--sky-l),var(--mint-l));border-radius:var(--radius);height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;margin-top:18px;border:2px dashed var(--sky);cursor:pointer;text-decoration:none;transition:background .2s;}
+.map-link:hover{background:linear-gradient(135deg,var(--sky),var(--mint));}
+.map-link span{font-size:2rem;}
+.map-link p{font-weight:800;color:var(--text);font-size:.92rem;}
+.map-link small{color:var(--text-l);font-weight:600;font-size:.78rem;}
+
+/* MODAL PEDIDO INDIVIDUAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(74,63,74,.5);backdrop-filter:blur(4px);z-index:400;align-items:center;justify-content:center;padding:16px;}
+.modal-overlay.open{display:flex;}
+.modal{background:white;border-radius:var(--radius-l);padding:28px;width:100%;max-width:430px;max-height:90vh;overflow-y:auto;box-shadow:0 16px 60px rgba(74,63,74,.25);animation:slideUp .3s ease;}
+@keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.modal-header h2{font-size:1.15rem;font-weight:900;color:var(--text);}
+.modal-close{background:var(--rose-l);border:none;border-radius:50%;width:34px;height:34px;font-size:1rem;cursor:pointer;color:var(--rose-d);}
+.modal-product-info{background:var(--rose-l);border-radius:var(--radius);padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;gap:10px;}
+.modal-product-info span{font-size:1.8rem;}
+.modal-product-info div strong{display:block;font-weight:900;color:var(--text);font-size:.92rem;}
+.modal-product-info div small{color:var(--rose-d);font-weight:700;font-size:.86rem;}
+.form-group{margin-bottom:14px;}
+.form-group label{display:block;font-weight:800;font-size:.82rem;color:var(--text);margin-bottom:5px;}
+.form-group input,.form-group textarea{width:100%;padding:11px 14px;border-radius:13px;border:2px solid var(--beige);background:var(--cream);font-family:'Nunito',sans-serif;font-size:.92rem;font-weight:600;color:var(--text);transition:border-color .2s;outline:none;}
+.form-group input:focus,.form-group textarea:focus{border-color:var(--rose);}
+.form-group textarea{min-height:72px;resize:vertical;}
+.btn-submit{width:100%;padding:13px;border-radius:50px;border:none;cursor:pointer;background:linear-gradient(135deg,#25d366,#128c7e);color:white;font-family:'Nunito',sans-serif;font-weight:900;font-size:.98rem;box-shadow:0 4px 16px rgba(37,211,102,.35);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-submit:hover{transform:translateY(-1px);}
+
+/* CHECKOUT MODAL (carrito completo) */
+.checkout-modal{background:white;border-radius:var(--radius-l);padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 16px 60px rgba(74,63,74,.25);animation:slideUp .3s ease;}
+.checkout-items-list{margin-bottom:16px;}
+.co-item{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--beige);font-size:.88rem;}
+.co-item:last-child{border-bottom:none;}
+.co-item-name{font-weight:700;color:var(--text);flex:1;}
+.co-item-qty{color:var(--text-l);font-weight:600;margin:0 10px;white-space:nowrap;}
+.co-item-price{font-weight:900;color:var(--rose-d);white-space:nowrap;}
+.co-total{display:flex;justify-content:space-between;padding:12px 0;font-size:1.05rem;}
+.co-total span{font-weight:700;color:var(--text-l);}
+.co-total strong{font-weight:900;color:var(--text);font-size:1.2rem;}
+
+/* LIGHTBOX */
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:500;align-items:center;justify-content:center;padding:16px;}
+.lightbox.open{display:flex;}
+.lightbox-inner{position:relative;max-width:90vw;max-height:90vh;}
+.lightbox-inner img,.lightbox-inner video{max-width:100%;max-height:85vh;border-radius:12px;object-fit:contain;}
+.lightbox-close{position:absolute;top:-14px;right:-14px;background:var(--rose-d);color:white;border:none;border-radius:50%;width:36px;height:36px;font-size:1.1rem;cursor:pointer;}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(100px);background:#25d366;color:white;padding:12px 26px;border-radius:50px;font-weight:800;font-size:.92rem;z-index:600;box-shadow:0 4px 20px rgba(0,0,0,.2);transition:transform .4s ease;pointer-events:none;display:flex;align-items:center;gap:8px;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* WA FLOAT */
+.wa-float{position:fixed;bottom:22px;right:22px;z-index:150;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#25d366,#128c7e);display:flex;align-items:center;justify-content:center;font-size:1.6rem;box-shadow:0 4px 20px rgba(37,211,102,.5);text-decoration:none;transition:transform .2s;animation:pulse 2.5s ease-in-out infinite;}
+.wa-float:hover{transform:scale(1.1);}
+@keyframes pulse{0%,100%{box-shadow:0 4px 20px rgba(37,211,102,.5);}50%{box-shadow:0 4px 32px rgba(37,211,102,.8);}}
+
+footer{background:linear-gradient(135deg,#4a3f4a,#6b5470);color:rgba(255,255,255,.7);text-align:center;padding:28px 16px;font-size:.85rem;font-weight:600;}
+footer strong{color:var(--rose);}
+footer .fl{display:flex;justify-content:center;gap:18px;margin-top:10px;flex-wrap:wrap;}
+footer .fl a{color:rgba(255,255,255,.5);text-decoration:none;transition:color .2s;cursor:pointer;}
+footer .fl a:hover{color:var(--rose);}
+
+.page-section{display:none;}
+.page-section.active{display:block;}
+#home{display:block;}
+.empty-state{text-align:center;padding:50px 16px;color:var(--text-l);}
+.empty-state span{font-size:3rem;display:block;margin-bottom:10px;}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo" onclick="showPage('home')">
+    <span class="nav-logo-icon">🍼</span>
+    <div class="nav-logo-text">Si Mamá!!!<span>Bolivia · Lactancia</span></div>
+  </div>
+  <div class="nav-links" id="navLinks">
+    <a onclick="showPage('home')" id="nav-home" class="active">🏠 Inicio</a>
+    <a onclick="showPage('productos')" id="nav-productos">🛍️ Productos</a>
+    <a onclick="showPage('nosotros')" id="nav-nosotros">💖 Nosotros</a>
+    <a onclick="showPage('uso')" id="nav-uso">▶️ Cómo usar</a>
+    <a onclick="showPage('ubicacion')" id="nav-ubicacion">📍 Ubicación</a>
+  </div>
+  <div class="nav-right">
+    <button class="cart-btn" onclick="openCart()">
+      🛒 Carrito
+      <span class="cart-count hidden" id="cartCount">0</span>
+    </button>
+    <button class="nav-menu-btn" onclick="toggleMenu()">☰</button>
+  </div>
+</nav>
+
+<!-- ══ HOME ══ -->
+<section class="page-section active" id="home">
+  <div class="hero">
+    <div class="hero-badge">🤱 Marca Especialista en Lactancia</div>
+    <h1>Si Mamá!!!</h1>
+    <p>Todo lo que necesitas para una lactancia feliz, cómoda y sin estrés. ¡Porque tú y tu bebé lo merecen! 💕</p>
+    <button class="hero-cta" onclick="showPage('productos')">🛍️ Ver todos los productos</button>
+    <div class="hero-bubbles">
+      <div class="hero-bubble"><div class="bico">💧</div><span>BPA Free</span></div>
+      <div class="hero-bubble"><div class="bico">🛡️</div><span>Garantía</span></div>
+      <div class="hero-bubble"><div class="bico">🚀</div><span>Envíos</span></div>
+      <div class="hero-bubble"><div class="bico">💬</div><span>Soporte</span></div>
+    </div>
+  </div>
+  <div class="section-title">Productos <span>Destacados</span></div>
+  <p class="section-sub">Los más elegidos por las mamás bolivianas ✨</p>
+  <div class="product-grid" id="featuredGrid"></div>
+  <div style="text-align:center;padding:0 0 36px">
+    <button class="hero-cta" onclick="showPage('productos')">Ver todos los productos →</button>
+  </div>
+</section>
+
+<!-- ══ PRODUCTOS ══ -->
+<section class="page-section" id="productos">
+  <div class="section-title" style="padding-top:28px">Nuestros <span>Productos</span></div>
+  <p class="section-sub">Elige tu extractor ideal 🤱</p>
+  <div class="cat-tabs" id="catTabs"></div>
+  <div class="product-grid" id="allProductsGrid"></div>
+</section>
+
+<!-- ══ NOSOTROS ══ -->
+<section class="page-section" id="nosotros">
+  <div style="background:linear-gradient(135deg,var(--rose-l),var(--mint-l));padding:36px 16px 48px;">
+    <div class="section-title" style="padding-top:0">Sobre <span>Nosotros</span></div>
+    <p class="section-sub">Tu aliada de confianza en el camino de la lactancia 💕</p>
+    <div class="about-hero">
+      <h2>Si Mamá!!! Bolivia</h2>
+      <p>Somos una marca boliviana especializada en lactancia materna. Nacimos con el propósito de acompañar a cada mamá en este hermoso proceso, ofreciendo productos de calidad, seguros, libres de BPA y a precios accesibles. 💖</p>
+    </div>
+    <div class="about-grid">
+      <div class="about-card"><div class="about-icon">🎯</div><h3>Misión</h3><p>Apoyar la lactancia con productos especializados y accesibles para todas las mamás de Bolivia.</p></div>
+      <div class="about-card"><div class="about-icon">👁️</div><h3>Visión</h3><p>Ser la marca de referencia en lactancia en Bolivia, reconocida por calidad y confianza.</p></div>
+      <div class="about-card"><div class="about-icon">💧</div><h3>BPA Free</h3><p>Todos nuestros productos están fabricados con materiales libres de BPA.</p></div>
+      <div class="about-card"><div class="about-icon">🛡️</div><h3>Garantía</h3><p>Extractores de marca propia con póliza de garantía de un año.</p></div>
+      <div class="about-card"><div class="about-icon">💬</div><h3>Soporte</h3><p>Atendemos por WhatsApp para ayudarte a elegir el extractor ideal.</p></div>
+      <div class="about-card"><div class="about-icon">🇧🇴</div><h3>100% Boliviana</h3><p>Conocemos las necesidades de las mamás bolivianas y trabajamos para ellas con orgullo.</p></div>
+    </div>
+    <div class="media-section">
+      <h3>📸 Nosotros en Ferias</h3>
+      <div class="media-grid" id="feriasGrid"></div>
+    </div>
+    <div class="media-section" style="margin-top:8px">
+      <h3>🎥 Videos de Ferias</h3>
+      <div class="media-grid" id="feriasVideosGrid"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ USO ══ -->
+<section class="page-section" id="uso">
+  <div class="section-title" style="padding-top:28px">▶️ Cómo <span>Usar</span></div>
+  <p class="section-sub">Guías y videos para sacar el máximo provecho a tu extractor 💕</p>
+  <div class="uso-grid" id="usoGrid"></div>
+  <div style="max-width:900px;margin:0 auto 40px;padding:0 16px;">
+    <div style="background:white;border-radius:var(--radius-l);padding:24px;box-shadow:var(--shadow);text-align:center;">
+      <div style="font-size:2rem;margin-bottom:8px">💬</div>
+      <h3 style="font-weight:900;margin-bottom:6px">¿Tienes dudas?</h3>
+      <p style="color:var(--text-l);font-weight:600;font-size:.9rem;margin-bottom:14px">Escríbenos por WhatsApp y te guiamos paso a paso 💕</p>
+      <a href="https://wa.me/59162303015" target="_blank" class="hero-cta" style="display:inline-flex">💬 Consultar por WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ UBICACIÓN ══ -->
+<section class="page-section" id="ubicacion">
+  <div class="section-title" style="padding-top:28px">Nuestra <span>Ubicación</span></div>
+  <p class="section-sub">Encuéntranos o contáctanos 📍</p>
+  <div style="padding:0 16px 48px;">
+    <div class="location-card">
+      <div class="location-item"><div class="location-icon">📱</div><div><h4>WhatsApp</h4><p>+591 62303015</p></div></div>
+      <div class="location-item"><div class="location-icon">🏙️</div><div><h4>Ciudad</h4><p>La Paz, Bolivia</p></div></div>
+      <div class="location-item"><div class="location-icon">🚚</div><div><h4>Entregas</h4><p>Envíos coordinados por WhatsApp.</p></div></div>
+      <div class="location-item"><div class="location-icon">🕐</div><div><h4>Horario</h4><p>Lun–Sáb: 9:00–19:00 · Dom: 10:00–14:00</p></div></div>
+      <a href="https://wa.me/59162303015" target="_blank" class="map-link">
+        <span>🗺️</span><p>Contactar por WhatsApp</p><small>+591 62303015</small>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CART DRAWER ══ -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-header">
+    <h2>🛒 Tu Carrito</h2>
+    <button class="cart-close-btn" onclick="closeCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cartItemsList"></div>
+  <div class="cart-footer" id="cartFooter" style="display:none">
+    <div class="cart-subtotal">
+      <span>Total estimado:</span>
+      <strong id="cartTotal">0 Bs.</strong>
+    </div>
+    <p class="cart-note">💡 Al enviar el pedido, se abrirá WhatsApp con todos los productos del carrito listos para confirmar.</p>
+    <button class="btn-checkout" onclick="checkoutCart()">💬 Pedir todo por WhatsApp</button>
+    <button class="btn-clear-cart" onclick="clearCart()">🗑️ Vaciar carrito</button>
+  </div>
+</div>
+
+<!-- MODAL PEDIDO INDIVIDUAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>✍️ Hacer Pedido</h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-product-info" id="modalProductInfo"></div>
+    <div class="form-group"><label>👤 Nombre completo *</label><input type="text" id="orderName" placeholder="María García"></div>
+    <div class="form-group"><label>📱 Teléfono / WhatsApp *</label><input type="tel" id="orderPhone" placeholder="70000000"></div>
+    <div class="form-group"><label>🏠 Dirección de envío *</label><textarea id="orderAddress" placeholder="Zona, calle, número..."></textarea></div>
+    <div class="form-group"><label>🔢 Cantidad</label><input type="number" id="orderQty" value="1" min="1" max="99"></div>
+    <button class="btn-submit" onclick="submitOrder()">💬 Enviar pedido por WhatsApp</button>
+    <p style="text-align:center;font-size:.75rem;color:var(--text-l);margin-top:10px;font-weight:600;">Se abrirá WhatsApp con tu pedido listo 🟢</p>
+  </div>
+</div>
+
+<!-- CHECKOUT MODAL (carrito) -->
+<div class="modal-overlay" id="checkoutOverlay">
+  <div class="checkout-modal">
+    <div class="modal-header">
+      <h2>🛒 Confirmar Pedido</h2>
+      <button class="modal-close" onclick="closeCheckout()">✕</button>
+    </div>
+    <div class="checkout-items-list" id="checkoutItemsList"></div>
+    <div class="co-total"><span>Total:</span><strong id="checkoutTotal">0 Bs.</strong></div>
+    <hr style="border:none;border-top:2px solid var(--beige);margin-bottom:16px">
+    <div class="form-group"><label>👤 Nombre completo *</label><input type="text" id="coName" placeholder="María García"></div>
+    <div class="form-group"><label>📱 Teléfono / WhatsApp *</label><input type="tel" id="coPhone" placeholder="70000000"></div>
+    <div class="form-group"><label>🏠 Dirección de envío *</label><textarea id="coAddress" placeholder="Zona, calle, número..."></textarea></div>
+    <button class="btn-submit" onclick="submitCartOrder()">💬 Enviar pedido completo por WhatsApp</button>
+    <p style="text-align:center;font-size:.75rem;color:var(--text-l);margin-top:10px;font-weight:600;">Se abrirá WhatsApp con todos los productos 🟢</p>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <div class="lightbox-inner" onclick="event.stopPropagation()">
+    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+    <img id="lightboxImg" src="" style="display:none">
+    <video id="lightboxVid" controls style="display:none"></video>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<a href="https://wa.me/59162303015" target="_blank" class="wa-float" title="WhatsApp">💬</a>
+
+<footer>
+  <div>Hecho con 💕 para las mamás bolivianas</div>
+  <div style="margin-top:5px"><strong>Si Mamá!!! Bolivia</strong> · Marca especialista en lactancia · Catálogo 2026</div>
+  <div style="margin-top:5px">📱 +591 62303015</div>
+  <div class="fl">
+    <a onclick="showPage('home')">Inicio</a>
+    <a onclick="showPage('productos')">Productos</a>
+    <a onclick="showPage('nosotros')">Nosotros</a>
+    <a onclick="showPage('uso')">Cómo usar</a>
+    <a href="admin.html">Admin</a>
+  </div>
+</footer>
+
+<script>
+// ══════════════════════════
+// CONFIG
+// ══════════════════════════
+const ADMIN_WA = '59162303015'; // ← Cambia aquí
+
+// ══════════════════════════
+// CATEGORÍAS
+// ══════════════════════════
+const CATS = [
+  {id:'all',          icon:'🌸', label:'Todos'},
+  {id:'manuales',     icon:'✋', label:'Manuales'},
+  {id:'manos-libres', icon:'🔓', label:'Manos Libres'},
+  {id:'doble',        icon:'⚡', label:'Doble Extracción'},
+  {id:'portatiles',   icon:'📱', label:'Portátiles'},
+  {id:'accesorios',   icon:'🎀', label:'Accesorios'},
+];
+
+// ══════════════════════════
+// PRODUCTOS
+// ══════════════════════════
+const DEFAULT_PRODUCTS = [
+  {id:'p1', name:'Extractor Manual NIKI',           category:'manuales',    price:90,  price2:null, desc:'BPA 0%. Ideal para uso ocasional, liviano y fácil de usar.',                                    emoji:'🤱', images:[], available:true, featured:true},
+  {id:'p2', name:'Extractor Manual HAHA PRINCE',    category:'manuales',    price:120, price2:null, desc:'BPA 0%. Succionador con doble nivel de presión.',                                               emoji:'🤱', images:[], available:true, featured:true},
+  {id:'p3', name:'Extractor INTELLIGENT RH228',     category:'doble',       price:300, price2:null, desc:'Alta fuerza. 2 modos, 5 niveles de succión. Doble extracción. Debe permanecer conectado.',     emoji:'⚡', images:[], available:true, featured:true},
+  {id:'p4', name:'Extractor Eléctrico Doble USB',   category:'doble',       price:350, price2:null, desc:'Sistema con manguera, doble tetero. Funciona vía USB.',                                        emoji:'⚡', images:[], available:true, featured:false},
+  {id:'p5', name:'Extractor RB-608',                category:'manos-libres',price:350, price2:null, desc:'Portátil, inalámbrico. 3 modos × 9 niveles. BPA Free ~180 ml.',                               emoji:'🌸', images:[], available:true, featured:true},
+  {id:'p6', name:'Extractor MY-376',                category:'manos-libres',price:350, price2:680,  desc:'3 modos × 9 niveles. Batería recargable. 180 ml.',                                             emoji:'🌸', images:[], available:true, featured:false},
+  {id:'p7', name:'Extractor MY-379',                category:'manos-libres',price:400, price2:780,  desc:'4 modos × 12 niveles. Anti-caídas, doble ritmo.',                                              emoji:'🌸', images:[], available:true, featured:false},
+  {id:'p8', name:'Extractor RH-289',                category:'portatiles',  price:320, price2:null, desc:'Eléctrico inalámbrico. 3 modos × 9 niveles. Incluye biberón y cojín.',                        emoji:'🌸', images:[], available:true, featured:false},
+  {id:'p9', name:'Extractor RH-668',                category:'manos-libres',price:550, price2:null, desc:'3 modos × 9 niveles. Silicona alimenticia. Incluye vaso de vidrio.',                          emoji:'💎', images:[], available:true, featured:false},
+  {id:'p10',name:'Extractor MY 382.1',              category:'manos-libres',price:600, price2:1100, desc:'4 modos × 12 niveles. Incluye repuestos.',                                                     emoji:'⭐', images:[], available:true, featured:false},
+  {id:'p11',name:'Extractor S21 — Si Mamá!!!',      category:'manos-libres',price:800, price2:null, desc:'3 modos × 12 niveles. Garantía 1 año. BPA Free.',                                             emoji:'👑', images:[], available:true, featured:false},
+  {id:'p12',name:'Extractor S32 — Si Mamá!!!',      category:'manos-libres',price:900, price2:null, desc:'4 modos × 9 niveles. Garantía 1 año. BPA Free.',                                              emoji:'👑', images:[], available:true, featured:false},
+  {id:'p13',name:'Extractor S33 — Si Mamá!!!',      category:'manos-libres',price:1000,price2:null, desc:'4 modos × 9 niveles. Garantía 1 año. Luz LED nocturna.',                                     emoji:'👑', images:[], available:true, featured:false},
+  {id:'p14',name:'Extractor MY 375/378',            category:'manos-libres',price:500, price2:880,  desc:'4 modos × 12 niveles. Incluye repuestos.',                                                     emoji:'🌟', images:[], available:true, featured:false},
+  {id:'p15',name:'Extractor MY 375',                category:'manos-libres',price:500, price2:950,  desc:'4 modos × 12 niveles. 2 bridas, cable, repuesto de válvula.',                                 emoji:'🌟', images:[], available:true, featured:false},
+  {id:'p16',name:'Vaso de Vidrio 210 ml',           category:'accesorios',  price:35,  price2:null, desc:'Con tapa de plástico. Sin marcación de onzas.',                                                emoji:'🥛', images:[], available:true, featured:false},
+  {id:'p17',name:'Vaso de Vidrio 180 ml',           category:'accesorios',  price:25,  price2:null, desc:'Con tapa de plástico. Sin marcación de onzas.',                                                emoji:'🥛', images:[], available:true, featured:false},
+  {id:'p18',name:'Recolectoras de Leche × 6',       category:'accesorios',  price:65,  price2:null, desc:'Set 6 recolectoras. Marca Only.',                                                              emoji:'🍼', images:[], available:true, featured:false},
+  {id:'p19',name:'Insertos de Brida 19/21 mm',      category:'accesorios',  price:30,  price2:null, desc:'Adaptadores de pezón 19 o 21 mm.',                                                            emoji:'🔧', images:[], available:true, featured:false},
+  {id:'p20',name:'Inserto de Brida 15/17 mm',       category:'accesorios',  price:60,  price2:null, desc:'Para pezones más pequeños.',                                                                   emoji:'🔧', images:[], available:true, featured:false},
+  {id:'p21',name:'Recolector Manual Silicona 80 ml',category:'accesorios',  price:60,  price2:null, desc:'Portátil, suave y fácil de usar.',                                                             emoji:'🌿', images:[], available:true, featured:false},
+  {id:'p22',name:'Bolso Térmico Banco de Leche',    category:'accesorios',  price:260, price2:null, desc:'2 refrigerantes y 3 vasos de almacenamiento.',                                                emoji:'🧊', images:[], available:true, featured:false},
+  {id:'p23',name:'Bolsitas 200 ml × 30 uds',        category:'accesorios',  price:60,  price2:null, desc:'BPA Free. Para almacenar leche materna.',                                                     emoji:'🛍️', images:[], available:true, featured:false},
+  {id:'p24',name:'Bolsitas Si Mamá 200 ml × 30',    category:'accesorios',  price:60,  price2:null, desc:'Bolsitas de la marca Si Mamá!!!',                                                             emoji:'🛍️', images:[], available:true, featured:false},
+  {id:'p25',name:'Bolsitas 200 ml × 60 uds',        category:'accesorios',  price:100, price2:null, desc:'Mayor cantidad para mamás que extraen frecuente.',                                             emoji:'🛍️', images:[], available:true, featured:false},
+  {id:'p26',name:'Vasos de Almacenamiento × 6',     category:'accesorios',  price:130, price2:null, desc:'Con tapa. Aptos para freezer.',                                                               emoji:'🥛', images:[], available:true, featured:false},
+  {id:'p27',name:'Formador de Pezón (silicona)',     category:'accesorios',  price:35,  price2:null, desc:'Ayuda a preparar el pezón para la lactancia.',                                                emoji:'🌸', images:[], available:true, featured:false},
+  {id:'p28',name:'Calentador Biberones Portátil',   category:'accesorios',  price:100, price2:null, desc:'Compacto, ligero. Funciona conectado. Ideal para salidas.',                                   emoji:'🌡️', images:[], available:true, featured:false},
+];
+
+// ══════════════════════════
+// STATE
+// ══════════════════════════
+let products = [];
+let currentCat = 'all';
+let currentOrderProduct = null;
+let cart = []; // [{id, name, price, qty, emoji}]
+const galState = {};
+
+function loadProducts(){
+  const s = localStorage.getItem('simama_products');
+  products = s ? JSON.parse(s) : DEFAULT_PRODUCTS;
+  if(!products.length){ products = DEFAULT_PRODUCTS; localStorage.setItem('simama_products', JSON.stringify(products)); }
+}
+function loadCart(){
+  cart = JSON.parse(localStorage.getItem('simama_cart') || '[]');
+  updateCartUI();
+}
+function saveCart(){ localStorage.setItem('simama_cart', JSON.stringify(cart)); updateCartUI(); }
+function getMedia(k){ return JSON.parse(localStorage.getItem(k)||'[]'); }
+
+// ══════════════════════════
+// CART LOGIC
+// ══════════════════════════
+function addToCart(productId){
+  const prod = products.find(p=>p.id===productId);
+  if(!prod) return;
+  const existing = cart.find(c=>c.id===productId);
+  if(existing){ existing.qty++; }
+  else { cart.push({id:prod.id, name:prod.name, price:prod.price, price2:prod.price2, emoji:prod.emoji||'🍼', qty:1}); }
+  saveCart();
+  showToast('🛒 Agregado al carrito — '+prod.name);
+  // refresh buttons
+  refreshCardButtons();
+}
+function removeFromCart(productId){
+  cart = cart.filter(c=>c.id!==productId);
+  saveCart();
+  renderCartItems();
+  refreshCardButtons();
+}
+function changeQty(productId, delta){
+  const item = cart.find(c=>c.id===productId);
+  if(!item) return;
+  item.qty += delta;
+  if(item.qty <= 0){ removeFromCart(productId); return; }
+  saveCart();
+  renderCartItems();
+}
+function clearCart(){
+  if(!confirm('¿Vaciar el carrito?')) return;
+  cart = [];
+  saveCart();
+  renderCartItems();
+  refreshCardButtons();
+}
+function cartTotal(){
+  return cart.reduce((s,c)=>{
+    // if qty>=2 and price2 exists, use price2 for the pair
+    const price = (c.qty >= 2 && c.price2) ? c.price2 + (c.price * Math.max(0, c.qty-2)) : c.price * c.qty;
+    return s + price;
+  }, 0);
+}
+function updateCartUI(){
+  const total = cart.reduce((s,c)=>s+c.qty,0);
+  const countEl = document.getElementById('cartCount');
+  if(total > 0){ countEl.textContent=total; countEl.classList.remove('hidden'); }
+  else { countEl.classList.add('hidden'); }
+}
+
+// ══════════════════════════
+// CART DRAWER
+// ══════════════════════════
+function openCart(){
+  document.getElementById('cartOverlay').classList.add('open');
+  document.getElementById('cartDrawer').classList.add('open');
+  renderCartItems();
+}
+function closeCart(){
+  document.getElementById('cartOverlay').classList.remove('open');
+  document.getElementById('cartDrawer').classList.remove('open');
+}
+function renderCartItems(){
+  const list = document.getElementById('cartItemsList');
+  const footer = document.getElementById('cartFooter');
+  if(!cart.length){
+    list.innerHTML=`<div class="cart-empty"><span>🛒</span><p>Tu carrito está vacío</p><button style="margin-top:8px;padding:10px 24px;border-radius:50px;border:none;cursor:pointer;background:var(--rose-l);color:var(--rose-d);font-family:Nunito,sans-serif;font-weight:800" onclick="closeCart();showPage('productos')">Ver productos</button></div>`;
+    footer.style.display='none';
+    return;
+  }
+  footer.style.display='block';
+  list.innerHTML = cart.map(item=>{
+    const subtotal = (item.qty>=2 && item.price2) ? item.price2 + (item.price * Math.max(0,item.qty-2)) : item.price * item.qty;
+    return `<div class="cart-item">
+      <div class="cart-item-emoji">${item.emoji}</div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${item.name}</div>
+        <div class="cart-item-price">${subtotal} Bs.</div>
+        <div class="cart-item-controls">
+          <button class="qty-btn" onclick="changeQty('${item.id}',-1)">−</button>
+          <span class="qty-val">${item.qty}</span>
+          <button class="qty-btn" onclick="changeQty('${item.id}',1)">+</button>
+        </div>
+      </div>
+      <button class="cart-item-del" onclick="removeFromCart('${item.id}')" title="Eliminar">🗑️</button>
+    </div>`;
+  }).join('');
+  document.getElementById('cartTotal').textContent = cartTotal() + ' Bs.';
+}
+
+// ══════════════════════════
+// CHECKOUT (carrito)
+// ══════════════════════════
+function checkoutCart(){
+  if(!cart.length) return;
+  closeCart();
+  // populate checkout modal
+  const itemsList = document.getElementById('checkoutItemsList');
+  itemsList.innerHTML = cart.map(item=>{
+    const subtotal = (item.qty>=2 && item.price2) ? item.price2 + (item.price * Math.max(0,item.qty-2)) : item.price * item.qty;
+    return `<div class="co-item">
+      <span class="co-item-name">${item.emoji} ${item.name}</span>
+      <span class="co-item-qty">× ${item.qty}</span>
+      <span class="co-item-price">${subtotal} Bs.</span>
+    </div>`;
+  }).join('');
+  document.getElementById('checkoutTotal').textContent = cartTotal() + ' Bs.';
+  ['coName','coPhone','coAddress'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('checkoutOverlay').classList.add('open');
+}
+function closeCheckout(){ document.getElementById('checkoutOverlay').classList.remove('open'); }
+
+function submitCartOrder(){
+  const name    = document.getElementById('coName').value.trim();
+  const phone   = document.getElementById('coPhone').value.trim();
+  const address = document.getElementById('coAddress').value.trim();
+  if(!name||!phone||!address){ alert('Por favor completa todos los campos 💕'); return; }
+
+  // Save each cart item as order
+  const orders = JSON.parse(localStorage.getItem('simama_orders')||'[]');
+  const orderId = 'cart-'+Date.now();
+  cart.forEach(item=>{
+    const subtotal = (item.qty>=2 && item.price2) ? item.price2 + (item.price * Math.max(0,item.qty-2)) : item.price * item.qty;
+    orders.push({id:orderId+'-'+item.id, product:item.name, productId:item.id, cliente:name, telefono:phone, direccion:address, cantidad:item.qty, total:subtotal, fecha:new Date().toLocaleString('es-BO'), estado:'pendiente'});
+  });
+  localStorage.setItem('simama_orders', JSON.stringify(orders));
+
+  // Build WA message
+  const lines = cart.map(item=>{
+    const sub = (item.qty>=2 && item.price2) ? item.price2 + (item.price * Math.max(0,item.qty-2)) : item.price * item.qty;
+    return `  • ${item.name} × ${item.qty} = ${sub} Bs.`;
+  }).join('\n');
+  const msg = encodeURIComponent(
+`🛍️ *PEDIDO CARRITO — Si Mamá!!! Bolivia*
+
+${lines}
+
+💰 *Total: ${cartTotal()} Bs.*
+
+👤 Cliente: ${name}
+📱 Teléfono: ${phone}
+🏠 Dirección: ${address}
+
+📅 ${new Date().toLocaleString('es-BO')}
+_Pedido desde la tienda web_`);
+
+  window.open(`https://wa.me/${ADMIN_WA}?text=${msg}`, '_blank');
+
+  // Clear cart
+  cart = [];
+  saveCart();
+  renderCartItems();
+  refreshCardButtons();
+  closeCheckout();
+  showToast('✅ ¡Pedido enviado! Abriendo WhatsApp...');
+}
+
+// ══════════════════════════
+// NAV
+// ══════════════════════════
+function showPage(page){
+  document.querySelectorAll('.page-section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(page).classList.add('active');
+  document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
+  const el=document.getElementById('nav-'+page);
+  if(el) el.classList.add('active');
+  document.getElementById('navLinks').classList.remove('open');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(page==='productos') renderAllProducts();
+  if(page==='nosotros')  renderNosotros();
+  if(page==='uso')       renderUso();
+}
+function toggleMenu(){ document.getElementById('navLinks').classList.toggle('open'); }
+
+// ══════════════════════════
+// GALLERY
+// ══════════════════════════
+function buildGallery(prod, cardId){
+  const imgs = prod.images && prod.images.length ? prod.images : [];
+  if(!imgs.length) return `<div class="card-gallery"><div class="card-gallery-inner"><div class="card-gallery-slide"><div class="placeholder">${prod.emoji||'🍼'}</div></div></div></div>`;
+  galState[cardId]=0;
+  const slides = imgs.map(src=>`<div class="card-gallery-slide"><img src="${src}" alt="${prod.name}" onerror="this.parentNode.innerHTML='<div class=placeholder>${prod.emoji||'🍼'}</div>'"></div>`).join('');
+  const dots = imgs.length>1 ? `<div class="gallery-dots">${imgs.map((_,i)=>`<div class="gallery-dot${i===0?' active':''}" onclick="goSlide('${cardId}',${i})"></div>`).join('')}</div>` : '';
+  const arrows = imgs.length>1 ? `<button class="gallery-btn gallery-prev" onclick="prevSlide('${cardId}')">‹</button><button class="gallery-btn gallery-next" onclick="nextSlide('${cardId}')">›</button>` : '';
+  return `<div class="card-gallery" id="gal-${cardId}">${arrows}<div class="card-gallery-inner" id="gali-${cardId}">${slides}</div>${dots}</div>`;
+}
+function goSlide(id,idx){
+  const inner=document.getElementById('gali-'+id); if(!inner) return;
+  const total=inner.children.length; idx=(idx+total)%total; galState[id]=idx;
+  inner.style.transform=`translateX(-${idx*100}%)`;
+  const gal=document.getElementById('gal-'+id);
+  if(gal) gal.querySelectorAll('.gallery-dot').forEach((d,i)=>d.classList.toggle('active',i===idx));
+}
+function nextSlide(id){ goSlide(id,(galState[id]||0)+1); }
+function prevSlide(id){ goSlide(id,(galState[id]||0)-1); }
+
+// ══════════════════════════
+// PRODUCT CARD
+// ══════════════════════════
+function isInCart(id){ return cart.some(c=>c.id===id); }
+function createCard(prod){
+  if(!prod.available) return '';
+  const has2 = prod.price2 && prod.price2>prod.price;
+  const cardId = 'c'+prod.id;
+  const inCart = isInCart(prod.id);
+  return `<div class="product-card" id="card-${prod.id}">
+    ${buildGallery(prod,cardId)}
+    <div class="card-body">
+      <div class="card-category">${catLabel(prod.category)}</div>
+      <div class="card-name">${prod.name}</div>
+      <div class="card-desc">${prod.desc||''}</div>
+      <div class="card-price">${prod.price} Bs.${has2?`<small style="display:block;color:var(--mint-d)">2 uds: ${prod.price2} Bs.</small>`:''}</div>
+      <div class="card-actions">
+        <button class="btn-cart${inCart?' in-cart':''}" id="cartbtn-${prod.id}" onclick="addToCart('${prod.id}')">
+          ${inCart?'✅ En carrito':'🛒 Al carrito'}
+        </button>
+        <button class="btn-pedir" onclick="openModal('${prod.id}')">💬 Pedir</button>
+      </div>
+    </div>
+  </div>`;
+}
+function catLabel(cat){
+  const c=CATS.find(x=>x.id===cat);
+  return c ? c.icon+' '+c.label : cat;
+}
+function refreshCardButtons(){
+  cart.forEach(item=>{
+    const btn=document.getElementById('cartbtn-'+item.id);
+    if(btn){ btn.classList.add('in-cart'); btn.textContent='✅ En carrito'; }
+  });
+  // reset buttons not in cart
+  products.forEach(p=>{
+    if(!isInCart(p.id)){
+      const btn=document.getElementById('cartbtn-'+p.id);
+      if(btn){ btn.classList.remove('in-cart'); btn.textContent='🛒 Al carrito'; }
+    }
+  });
+}
+
+// ══════════════════════════
+// RENDER HOME
+// ══════════════════════════
+function renderFeatured(){
+  const feat = products.filter(p=>p.featured&&p.available).slice(0,4);
+  document.getElementById('featuredGrid').innerHTML = feat.length
+    ? feat.map(createCard).join('')
+    : `<div class="empty-state" style="grid-column:1/-1"><span>🛍️</span><p>Cargando...</p></div>`;
+}
+
+// ══════════════════════════
+// RENDER PRODUCTOS
+// ══════════════════════════
+function renderAllProducts(){
+  buildCatTabs();
+  filterProducts(currentCat);
+}
+function buildCatTabs(){
+  document.getElementById('catTabs').innerHTML = CATS.map(c=>`
+    <button class="cat-tab${currentCat===c.id?' active':''}" onclick="filterProducts('${c.id}')">
+      <span class="ti">${c.icon}</span>${c.label}
+    </button>`).join('');
+}
+function filterProducts(cat){
+  currentCat=cat; buildCatTabs();
+  const list = cat==='all' ? products.filter(p=>p.available) : products.filter(p=>p.available&&p.category===cat);
+  document.getElementById('allProductsGrid').innerHTML = list.length
+    ? list.map(createCard).join('')
+    : `<div class="empty-state" style="grid-column:1/-1"><span>😔</span><p>Sin productos en esta categoría.</p></div>`;
+}
+
+// ══════════════════════════
+// NOSOTROS MEDIA
+// ══════════════════════════
+function renderNosotros(){
+  const fotos  = getMedia('simama_ferias_fotos');
+  const videos = getMedia('simama_ferias_videos');
+  const fg = document.getElementById('feriasGrid');
+  fg.innerHTML = fotos.length
+    ? fotos.map(f=>`<div class="media-item" onclick="openLightbox('img','${f.url}')"><img src="${f.url}" alt="${f.label||'Feria'}"><div class="media-label">${f.label||'Feria Si Mamá!!!'}</div></div>`).join('')
+    : `<div class="media-placeholder"><span>📸</span>Las fotos de ferias se agregan desde el panel admin</div>`;
+  const vg = document.getElementById('feriasVideosGrid');
+  vg.innerHTML = videos.length
+    ? videos.map(v=>{
+        if(v.type==='youtube'){ const vid=ytId(v.url); return `<div class="media-item"><iframe src="https://www.youtube.com/embed/${vid}" allowfullscreen style="width:100%;height:160px;border:none"></iframe><div class="media-label">${v.label||'Video'}</div></div>`; }
+        return `<div class="media-item" onclick="openLightbox('vid','${v.url}')"><video src="${v.url}" style="width:100%;height:160px;object-fit:cover"></video><div class="media-label">${v.label||'Video feria'}</div></div>`;
+      }).join('')
+    : `<div class="media-placeholder"><span>🎥</span>Los videos de ferias se agregan desde el panel admin</div>`;
+}
+
+// ══════════════════════════
+// USO
+// ══════════════════════════
+function renderUso(){
+  const videos = getMedia('simama_uso_videos');
+  const grid = document.getElementById('usoGrid');
+  grid.innerHTML = videos.length
+    ? videos.map(v=>{
+        if(v.type==='youtube'){ const vid=ytId(v.url); return `<div class="uso-card"><iframe src="https://www.youtube.com/embed/${vid}" allowfullscreen></iframe><div class="uso-info"><h4>${v.label||'Cómo usar'}</h4><p>${v.desc||''}</p></div></div>`; }
+        return `<div class="uso-card"><video src="${v.url}" controls></video><div class="uso-info"><h4>${v.label||'Cómo usar'}</h4><p>${v.desc||''}</p></div></div>`;
+      }).join('')
+    : `<div class="uso-card"><div class="uso-placeholder"><span>▶️</span><p>Videos de uso se agregan desde el panel admin</p></div><div class="uso-info"><h4>Próximamente</h4><p>Guías paso a paso</p></div></div>
+       <div class="uso-card"><div class="uso-placeholder"><span>📹</span><p>Agrega videos de YouTube o URL directa</p></div><div class="uso-info"><h4>Próximamente</h4><p>Tips y consejos</p></div></div>`;
+}
+
+function ytId(url){ const m=url.match(/(?:youtu\.be\/|youtube\.com\/(?:.*v=|.*\/))([^?&]+)/); return m?m[1]:''; }
+
+// ══════════════════════════
+// LIGHTBOX
+// ══════════════════════════
+function openLightbox(type,src){
+  const lb=document.getElementById('lightbox');
+  const img=document.getElementById('lightboxImg');
+  const vid=document.getElementById('lightboxVid');
+  if(type==='img'){img.src=src;img.style.display='block';vid.style.display='none';}
+  else{vid.src=src;vid.style.display='block';img.style.display='none';}
+  lb.classList.add('open');
+}
+function closeLightbox(){ document.getElementById('lightbox').classList.remove('open'); document.getElementById('lightboxVid').src=''; }
+
+// ══════════════════════════
+// MODAL PEDIDO INDIVIDUAL
+// ══════════════════════════
+function openModal(productId){
+  const prod=products.find(p=>p.id===productId); if(!prod) return;
+  currentOrderProduct=prod;
+  const has2=prod.price2&&prod.price2>prod.price;
+  document.getElementById('modalProductInfo').innerHTML=`<span>${prod.emoji||'🍼'}</span><div><strong>${prod.name}</strong><small>${prod.price} Bs.${has2?` / 2 uds: ${prod.price2} Bs.`:''}</small></div>`;
+  ['orderName','orderPhone','orderAddress'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('orderQty').value=1;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal(){ document.getElementById('modalOverlay').classList.remove('open'); currentOrderProduct=null; }
+
+function submitOrder(){
+  const name=document.getElementById('orderName').value.trim();
+  const phone=document.getElementById('orderPhone').value.trim();
+  const address=document.getElementById('orderAddress').value.trim();
+  const qty=parseInt(document.getElementById('orderQty').value)||1;
+  if(!name||!phone||!address){alert('Por favor completa todos los campos 💕');return;}
+  const prod=currentOrderProduct;
+  const total=qty>=2&&prod.price2?prod.price2:prod.price*qty;
+  const orders=JSON.parse(localStorage.getItem('simama_orders')||'[]');
+  orders.push({id:'ord-'+Date.now(),product:prod.name,productId:prod.id,cliente:name,telefono:phone,direccion:address,cantidad:qty,total,fecha:new Date().toLocaleString('es-BO'),estado:'pendiente'});
+  localStorage.setItem('simama_orders',JSON.stringify(orders));
+  const msg=encodeURIComponent(`🛍️ *NUEVO PEDIDO — Si Mamá!!! Bolivia*\n\n📦 Producto: ${prod.name}\n🔢 Cantidad: ${qty}\n💰 Total: ${total} Bs.\n\n👤 Cliente: ${name}\n📱 Teléfono: ${phone}\n🏠 Dirección: ${address}\n\n📅 ${new Date().toLocaleString('es-BO')}\n_Pedido desde la tienda web_`);
+  window.open(`https://wa.me/${ADMIN_WA}?text=${msg}`,'_blank');
+  closeModal();
+  showToast('✅ ¡Pedido enviado! Abriendo WhatsApp...');
+}
+
+// ══════════════════════════
+// TOAST
+// ══════════════════════════
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+// ══════════════════════════
+// CLOSE ON BACKDROP
+// ══════════════════════════
+document.getElementById('modalOverlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
+document.getElementById('checkoutOverlay').addEventListener('click',function(e){if(e.target===this)closeCheckout();});
+
+// ══════════════════════════
+// INIT
+// ══════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  loadProducts();
+  loadCart();
+  renderFeatured();
+});
+</script>
+</body>
+</html>
